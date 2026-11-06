@@ -1,0 +1,92 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function getUserRole() {
+      return request.auth.token.role;
+    }
+
+    function isStaffOrAdmin() {
+      return isAuthenticated() && (
+        getUserRole() in ['super_admin', 'admin_sekolah', 'panitia_spmb', 'tim_seleksi', 'kepala_sekolah']
+      );
+    }
+
+    // Public collections (read-only for public, editable by staff)
+    match /school_profiles/{profileId} {
+      allow read: if true;
+      allow write: if isAuthenticated() && getUserRole() in ['super_admin', 'admin_sekolah'];
+    }
+
+    match /programs/{programId} {
+      allow read: if true;
+      allow write: if isAuthenticated() && getUserRole() in ['super_admin', 'admin_sekolah'];
+    }
+
+    match /extracurriculars/{ekskulId} {
+      allow read: if true;
+      allow write: if isAuthenticated() && getUserRole() in ['super_admin', 'admin_sekolah'];
+    }
+
+    match /teachers/{teacherId} {
+      allow read: if true;
+      allow write: if isAuthenticated() && getUserRole() in ['super_admin', 'admin_sekolah'];
+    }
+
+    match /gallery/{itemId} {
+      allow read: if true;
+      allow write: if isAuthenticated() && getUserRole() in ['super_admin', 'admin_sekolah'];
+    }
+
+    match /achievements/{achievementId} {
+      allow read: if true;
+      allow write: if isAuthenticated() && getUserRole() in ['super_admin', 'admin_sekolah'];
+    }
+
+    match /news/{newsId} {
+      allow read: if true;
+      allow write: if isAuthenticated() && getUserRole() in ['super_admin', 'admin_sekolah'];
+    }
+
+    match /spmb_waves/{waveId} {
+      allow read: if true;
+      allow write: if isAuthenticated() && getUserRole() in ['super_admin', 'panitia_spmb'];
+    }
+
+    // Registrations & Personal child data protection:
+    // Only the parent owner or authorized staff can read or write
+    match /registrations/{regId} {
+      allow read: if isStaffOrAdmin() || (isAuthenticated() && resource.data.userId == request.auth.uid);
+      allow create: if isAuthenticated();
+      allow update: if isStaffOrAdmin() || (isAuthenticated() && resource.data.userId == request.auth.uid);
+      allow delete: if isAuthenticated() && getUserRole() == 'super_admin';
+    }
+
+    // Verification and Selection Logs
+    match /verification_logs/{logId} {
+      allow read: if isStaffOrAdmin();
+      allow create: if isStaffOrAdmin();
+    }
+
+    // Activity Audit Logs
+    match /activity_logs/{logId} {
+      allow read: if isAuthenticated() && getUserRole() in ['super_admin', 'kepala_sekolah'];
+      allow create: if isAuthenticated();
+    }
+
+    // Users and Roles
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isStaffOrAdmin();
+      allow write: if isOwner(userId) || (isAuthenticated() && getUserRole() == 'super_admin');
+    }
+  }
+}
