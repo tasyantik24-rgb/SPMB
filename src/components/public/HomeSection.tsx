@@ -88,10 +88,10 @@ export const HomeSection: React.FC<HomeSectionProps> = ({
               </p>
 
               {/* CTAs */}
-              <div className="flex flex-wrap items-center gap-3 pt-4">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3 pt-4">
                 <button
                   onClick={() => onNavigate('wizard')}
-                  className="px-6 py-3.5 bg-[#D5AA53] hover:bg-[#c49942] text-stone-900 font-bold text-xs sm:text-sm rounded-xl shadow-lg transition-transform hover:-translate-y-0.5 flex items-center gap-2 cursor-pointer"
+                  className="w-full sm:w-auto px-6 py-3.5 bg-[#D5AA53] hover:bg-[#c49942] text-stone-900 font-bold text-xs sm:text-sm rounded-xl shadow-lg transition-transform hover:-translate-y-0.5 flex items-center justify-center gap-2 cursor-pointer min-h-[44px]"
                 >
                   <span>Daftar SPMB Sekarang</span>
                   <ArrowRight className="w-4 h-4" />
@@ -99,14 +99,14 @@ export const HomeSection: React.FC<HomeSectionProps> = ({
 
                 <button
                   onClick={() => onNavigate('cek-status')}
-                  className="px-5 py-3.5 bg-white/10 hover:bg-white/20 text-white font-semibold text-xs sm:text-sm rounded-xl border border-white/20 transition-colors flex items-center gap-2 cursor-pointer"
+                  className="w-full sm:w-auto px-5 py-3.5 bg-white/10 hover:bg-white/20 text-white font-semibold text-xs sm:text-sm rounded-xl border border-white/20 transition-colors flex items-center justify-center gap-2 cursor-pointer min-h-[44px]"
                 >
                   <span>Cek Status Pendaftaran</span>
                 </button>
 
                 <button
                   onClick={() => onNavigate('profil')}
-                  className="px-5 py-3.5 text-stone-300 hover:text-white font-semibold text-xs sm:text-sm transition-colors flex items-center gap-1.5 cursor-pointer"
+                  className="w-full sm:w-auto px-5 py-3 text-stone-300 hover:text-white font-semibold text-xs sm:text-sm transition-colors flex items-center justify-center gap-1.5 cursor-pointer min-h-[44px]"
                 >
                   <span>Jelajahi Profil</span>
                   <ChevronRight className="w-4 h-4 text-[#D5AA53]" />
@@ -474,18 +474,19 @@ export const HomeSection: React.FC<HomeSectionProps> = ({
               Kuota terbatas 60 siswa (2 rombel paralel). Pendaftaran online dibuka hingga {formatDateId(wave.endDate)}. Fasilitas ruang ber-AC, masjid luas, dan guru bersertifikasi.
             </p>
 
-            <div className="pt-2 flex flex-wrap items-center gap-3">
+            <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
               <button
                 onClick={() => onNavigate('wizard')}
-                className="px-6 py-3.5 bg-[#D5AA53] hover:bg-[#c49942] text-stone-900 font-bold text-xs sm:text-sm rounded-xl shadow-md transition-transform hover:-translate-y-0.5 cursor-pointer"
+                className="w-full sm:w-auto px-6 py-3.5 bg-[#D5AA53] hover:bg-[#c49942] text-stone-900 font-bold text-xs sm:text-sm rounded-xl shadow-md transition-transform hover:-translate-y-0.5 cursor-pointer text-center min-h-[44px] flex items-center justify-center gap-2"
               >
-                Mulai Pendaftaran 9 Tahap
+                <span>Mulai Pendaftaran Online</span>
+                <ArrowRight className="w-4 h-4" />
               </button>
               <button
                 onClick={() => onNavigate('spmb')}
-                className="px-5 py-3.5 bg-white/10 hover:bg-white/20 text-white font-semibold text-xs sm:text-sm rounded-xl border border-white/20 transition-colors cursor-pointer"
+                className="w-full sm:w-auto px-5 py-3.5 bg-white/10 hover:bg-white/20 text-white font-semibold text-xs sm:text-sm rounded-xl border border-white/20 transition-colors cursor-pointer text-center min-h-[44px] flex items-center justify-center"
               >
-                Persyaratan & Jadwal
+                <span>Persyaratan & Jadwal</span>
               </button>
             </div>
           </div>

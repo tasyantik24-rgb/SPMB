@@ -78,17 +78,17 @@
       }
     ],
     "branding": {
-      "mainLogoUrl": "",
-      "faviconUrl": "",
-      "navbarLogoUrl": "",
-      "footerLogoUrl": "",
-      "loginLogoUrl": "",
-      "receiptLogoUrl": "",
+      "mainLogoUrl": "/assets/aistudio/5_4164f3ac.png",
+      "faviconUrl": "/assets/aistudio/5_4164f3ac.png",
+      "navbarLogoUrl": "/assets/aistudio/5_4164f3ac.png",
+      "footerLogoUrl": "/assets/aistudio/5_4164f3ac.png",
+      "loginLogoUrl": "/assets/aistudio/5_4164f3ac.png",
+      "receiptLogoUrl": "/assets/aistudio/5_4164f3ac.png",
       "heroBannerUrl": "/src/assets/images/hero_school_building_1793682340462.jpg",
       "spmbBannerUrl": "/src/assets/images/student_learning_activity_1793682341759.jpg",
       "logoScale": 100,
       "showSchoolNameNextToLogo": true,
-      "updatedAt": "2026-11-02T10:00:00Z"
+      "updatedAt": "2026-11-08T10:00:00Z"
     }
   },
   "programs": [
@@ -435,7 +435,7 @@
     "reRegistrationStartDate": "2027-01-12",
     "reRegistrationEndDate": "2027-01-25",
     "quota": 60,
-    "registeredCount": 38,
+    "registeredCount": 39,
     "acceptedCount": 24,
     "registrationFee": 200000,
     "isActive": true,
@@ -1492,6 +1492,51 @@
   ],
   "activityLogs": [
     {
+      "id": "log-1794151159352",
+      "userId": "admin",
+      "userName": "Administrator",
+      "userRole": "super_admin",
+      "action": "Hapus Data Pendaftaran",
+      "details": "Menghapus pendaftaran SPMB-2026-0005 (Ahmad Fauzan Pratama)",
+      "timestamp": "2026-11-08T15:19:19.352Z"
+    },
+    {
+      "id": "log-1794151144470",
+      "userId": "test-user-1",
+      "userName": "Budi Pratama",
+      "userRole": "pendaftar",
+      "action": "Submit Pendaftaran SPMB",
+      "details": "Mendaftarkan calon siswa Ahmad Fauzan Pratama dengan nomor SPMB-2026-0005",
+      "timestamp": "2026-11-08T15:19:04.470Z"
+    },
+    {
+      "id": "log-1794151123923",
+      "userId": "admin",
+      "userName": "Super Admin",
+      "userRole": "super_admin",
+      "action": "Update Pengaturan WhatsApp SPMB",
+      "details": "Memperbarui tautan grup WhatsApp SPMB: Aktif",
+      "timestamp": "2026-11-08T15:18:43.923Z"
+    },
+    {
+      "id": "log-1794151116089",
+      "userId": "admin",
+      "userName": "Super Admin",
+      "userRole": "super_admin",
+      "action": "Update Pengaturan WhatsApp SPMB",
+      "details": "Memperbarui tautan grup WhatsApp SPMB: Nonaktif",
+      "timestamp": "2026-11-08T15:18:36.089Z"
+    },
+    {
+      "id": "log-1794151105568",
+      "userId": "admin",
+      "userName": "Super Admin",
+      "userRole": "super_admin",
+      "action": "Update Pengaturan WhatsApp SPMB",
+      "details": "Memperbarui tautan grup WhatsApp SPMB: Aktif",
+      "timestamp": "2026-11-08T15:18:25.568Z"
+    },
+    {
       "id": "log-1",
       "userId": "usr-panitia",
       "userName": "Ahmad Syafii",
@@ -1535,7 +1580,14 @@
     "showDemoNotice": true,
     "dataSource": "local_database",
     "firebaseConfigured": false,
-    "lastBackupDate": "2026-11-02"
+    "lastBackupDate": "2026-11-02",
+    "googleSheetSettings": {
+      "spreadsheetId": "1_zt6amQtAr3eGjSPqwaJrIT_irLZvICla9j5lOX2kEM",
+      "appsScriptUrl": "",
+      "autoSync": true,
+      "lastSyncStatus": "idle",
+      "lastSyncMessage": "Siap menghubungkan ke Google Apps Script Spreadsheet 1_zt6amQtAr3eGjSPqwaJrIT_irLZvICla9j5lOX2kEM"
+    }
   },
   "mediaLibrary": [
     {
@@ -1620,6 +1672,7 @@
   "whatsappSettings": {
     "groupName": "Grup Resmi SPMB SDIT INSAN CENDIKIA KALIBARU",
     "inviteLink": "https://chat.whatsapp.com/SDITInsanCendikia2027SPMB",
+    "groupLink": "https://chat.whatsapp.com/SDITInsanCendikia2027SPMB",
     "isActive": true,
     "allowedStatuses": [
       "Terverifikasi",
@@ -1629,15 +1682,36 @@
       "Selesai Daftar Ulang",
       "Daftar Ulang"
     ],
-    "infoMessage": "Selamat! Pendaftaran ananda telah TERVERIFIKASI oleh Panitia SPMB. Silakan bergabung ke WhatsApp Group Resmi SPMB SDIT Insan Cendikia Kalibaru untuk panduan jadwal observasi, pengumuman berkas, dan dialog bersama asatidz.",
-    "updatedAt": "2026-11-01T08:00:00Z",
-    "updatedBy": "Ustadz Admin Utama",
+    "infoMessage": "Terima kasih telah mendaftar di SDIT INSAN CENDIKIA KALIBARU. Silakan bergabung dengan Grup WhatsApp Resmi SPMB untuk memperoleh informasi terbaru mengenai tahapan dan proses penerimaan siswa baru.",
+    "updatedAt": "2026-11-08T15:18:43.922Z",
+    "updatedBy": "Super Admin",
     "history": [
+      {
+        "id": "wahist-1794151123922",
+        "link": "https://chat.whatsapp.com/SDITInsanCendikia2027SPMB",
+        "changedBy": "Super Admin",
+        "changedAt": "2026-11-08T15:18:43.922Z",
+        "notes": "Pembaruan konfigurasi grup WhatsApp SPMB"
+      },
+      {
+        "id": "wahist-1794151116089",
+        "link": "https://chat.whatsapp.com/SDITInsanCendikia2027SPMB",
+        "changedBy": "Super Admin",
+        "changedAt": "2026-11-08T15:18:36.089Z",
+        "notes": "Pembaruan konfigurasi grup WhatsApp SPMB"
+      },
+      {
+        "id": "wahist-1794151105568",
+        "link": "https://chat.whatsapp.com/CendikiaBaru2027Resmi",
+        "changedBy": "Super Admin",
+        "changedAt": "2026-11-08T15:18:25.568Z",
+        "notes": "Pembaruan konfigurasi grup WhatsApp SPMB"
+      },
       {
         "id": "wahist-1",
         "link": "https://chat.whatsapp.com/SDITInsanCendikia2027SPMB",
-        "changedBy": "Ustadz Admin Utama",
-        "changedAt": "2026-11-01T08:00:00Z",
+        "changedBy": "Super Admin",
+        "changedAt": "2026-11-08T08:00:00Z",
         "notes": "Inisialisasi link grup resmi WhatsApp SPMB TA 2027/2028"
       }
     ]

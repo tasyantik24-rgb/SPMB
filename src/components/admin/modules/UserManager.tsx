@@ -224,7 +224,7 @@ export const UserManager: React.FC<UserManagerProps> = ({ users, onRefresh }) =>
               password: ''
             });
           }}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-[#123B35] hover:bg-[#1a544b] text-white font-semibold rounded-lg shadow-xs cursor-pointer transition-colors"
+          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#123B35] hover:bg-[#1a544b] text-white font-semibold rounded-xl shadow-xs cursor-pointer transition-colors min-h-[44px]"
         >
           <Plus className="w-4 h-4 text-[#D5AA53]" />
           <span>Tambah Akun Petugas</span>

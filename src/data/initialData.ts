@@ -104,17 +104,17 @@ export const INITIAL_SCHOOL_PROFILE: SchoolProfile = {
     }
   ],
   branding: {
-    mainLogoUrl: '',
-    faviconUrl: '',
-    navbarLogoUrl: '',
-    footerLogoUrl: '',
-    loginLogoUrl: '',
-    receiptLogoUrl: '',
+    mainLogoUrl: '/assets/aistudio/5_4164f3ac.png',
+    faviconUrl: '/assets/aistudio/5_4164f3ac.png',
+    navbarLogoUrl: '/assets/aistudio/5_4164f3ac.png',
+    footerLogoUrl: '/assets/aistudio/5_4164f3ac.png',
+    loginLogoUrl: '/assets/aistudio/5_4164f3ac.png',
+    receiptLogoUrl: '/assets/aistudio/5_4164f3ac.png',
     heroBannerUrl: '/src/assets/images/hero_school_building_1793682340462.jpg',
     spmbBannerUrl: '/src/assets/images/student_learning_activity_1793682341759.jpg',
     logoScale: 100,
     showSchoolNameNextToLogo: true,
-    updatedAt: '2026-11-02T10:00:00Z'
+    updatedAt: '2026-11-08T10:00:00Z'
   }
 };
 
@@ -1086,6 +1086,7 @@ export const INITIAL_MEDIA_LIBRARY: MediaItem[] = [
 export const INITIAL_WHATSAPP_SETTINGS: WhatsAppGroupSettings = {
   groupName: 'Grup Resmi SPMB SDIT INSAN CENDIKIA KALIBARU',
   inviteLink: 'https://chat.whatsapp.com/SDITInsanCendikia2027SPMB',
+  groupLink: 'https://chat.whatsapp.com/SDITInsanCendikia2027SPMB',
   isActive: true,
   allowedStatuses: [
     'Terverifikasi',
@@ -1095,9 +1096,9 @@ export const INITIAL_WHATSAPP_SETTINGS: WhatsAppGroupSettings = {
     'Selesai Daftar Ulang',
     'Daftar Ulang'
   ],
-  infoMessage: 'Selamat! Pendaftaran ananda telah TERVERIFIKASI oleh Panitia SPMB. Silakan bergabung ke WhatsApp Group Resmi SPMB SDIT Insan Cendikia Kalibaru untuk panduan jadwal observasi, pengumuman berkas, dan dialog bersama asatidz.',
-  updatedAt: '2026-11-01T08:00:00Z',
-  updatedBy: 'Ustadz Admin Utama',
+  infoMessage: 'Terima kasih telah mendaftar di SDIT INSAN CENDIKIA KALIBARU. Silakan bergabung dengan Grup WhatsApp Resmi SPMB untuk memperoleh informasi terbaru mengenai tahapan dan proses penerimaan siswa baru.',
+  updatedAt: '2026-11-08T08:00:00Z',
+  updatedBy: 'Super Admin',
   history: [
     {
       id: 'wahist-1',

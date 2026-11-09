@@ -130,7 +130,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
               <img
                 src={branding.loginLogoUrl || branding.mainLogoUrl}
                 alt="Logo Sekolah"
-                className="w-12 h-12 object-contain rounded-xl p-1 bg-white/10 border border-white/20 shadow-xs shrink-0"
+                className="w-12 h-12 object-contain rounded-xl p-1 bg-white border border-stone-200 shadow-xs shrink-0"
               />
             ) : (
               <div className="w-12 h-12 rounded-xl bg-[#D5AA53] flex items-center justify-center font-serif font-black text-[#123B35] text-lg shrink-0 shadow-xs">

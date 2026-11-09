@@ -75,10 +75,10 @@ export const SpmbSection: React.FC<SpmbSectionProps> = ({
               Periode pendaftaran: <strong>{formatDateId(wave.startDate)}</strong> s.d. <strong>{formatDateId(wave.endDate)}</strong>. Segera daftarkan ananda sebelum kuota terpenuhi.
             </p>
 
-            <div className="flex flex-wrap items-center gap-3 pt-2">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
               <button
                 onClick={onStartRegistration}
-                className="px-6 py-3.5 bg-[#D5AA53] hover:bg-[#c49942] text-stone-900 font-bold text-xs sm:text-sm rounded-xl shadow-md transition-transform hover:-translate-y-0.5 cursor-pointer flex items-center gap-2"
+                className="w-full sm:w-auto px-6 py-3.5 bg-[#D5AA53] hover:bg-[#c49942] text-stone-900 font-bold text-xs sm:text-sm rounded-xl shadow-md transition-transform hover:-translate-y-0.5 cursor-pointer flex items-center justify-center gap-2 min-h-[44px]"
               >
                 <span>Mulai Pendaftaran Online</span>
                 <ArrowRight className="w-4 h-4" />
@@ -86,9 +86,9 @@ export const SpmbSection: React.FC<SpmbSectionProps> = ({
 
               <button
                 onClick={onGoToPortal}
-                className="px-6 py-3.5 bg-white/10 hover:bg-white/20 text-white font-semibold text-xs sm:text-sm rounded-xl border border-white/20 transition-colors cursor-pointer"
+                className="w-full sm:w-auto px-6 py-3.5 bg-white/10 hover:bg-white/20 text-white font-semibold text-xs sm:text-sm rounded-xl border border-white/20 transition-colors cursor-pointer text-center min-h-[44px] flex items-center justify-center"
               >
-                Cek Status Pendaftaran
+                <span>Cek Status Pendaftaran</span>
               </button>
             </div>
           </div>

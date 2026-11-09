@@ -20,6 +20,8 @@ import {
 } from '../../types';
 import { api } from '../../lib/api';
 import { RegistrationReceipt } from './RegistrationReceipt';
+import { formatDateId } from '../../lib/utils';
+import { downloadElementAsPdf } from '../../lib/pdfGenerator';
 import {
   User as UserIcon,
   Users,
@@ -42,8 +44,18 @@ import {
   Home,
   Info,
   Search,
-  Eye
+  Eye,
+  Download,
+  Loader2,
+  ExternalLink,
+  MessageSquare
 } from 'lucide-react';
+
+const WhatsAppIcon: React.FC<{ className?: string }> = ({ className = 'w-5 h-5' }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.456 5.711 1.458h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+  </svg>
+);
 
 interface RegistrationWizardProps {
   schoolProfile: SchoolProfile;
@@ -105,6 +117,16 @@ export const RegistrationWizard: React.FC<RegistrationWizardProps> = ({
   const [submittedRegistration, setSubmittedRegistration] = useState<Registration | null>(null);
   const [showReceiptModal, setShowReceiptModal] = useState(false);
   const [copiedBank, setCopiedBank] = useState(false);
+  const [copiedRegNumber, setCopiedRegNumber] = useState(false);
+  const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
+  const [whatsAppGroup, setWhatsAppGroup] = useState<{
+    groupName: string;
+    inviteLink: string;
+    groupLink?: string;
+    isActive: boolean;
+    infoMessage: string;
+    updatedAt?: string;
+  } | null>(null);
 
   // Waves
   const [waves, setWaves] = useState<SpmbWave[]>([]);
@@ -116,6 +138,12 @@ export const RegistrationWizard: React.FC<RegistrationWizardProps> = ({
         setWaves(data);
         const openWave = data.find(w => w.status === 'Dibuka') || data[0];
         if (openWave) setSelectedWaveId(openWave.id);
+      })
+      .catch(console.error);
+
+    api.getPublicWhatsAppGroup()
+      .then(data => {
+        if (data) setWhatsAppGroup(data);
       })
       .catch(console.error);
   }, []);
@@ -533,6 +561,12 @@ export const RegistrationWizard: React.FC<RegistrationWizardProps> = ({
 
       const result = await api.createRegistration(payload);
       setSubmittedRegistration(result);
+      try {
+        const latestWa = await api.getPublicWhatsAppGroup();
+        if (latestWa) setWhatsAppGroup(latestWa);
+      } catch (e) {
+        // use fallback loaded state
+      }
       setCurrentStep(6); // Step 6: Confirmation & Unique Registration Code
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err: any) {
@@ -540,6 +574,33 @@ export const RegistrationWizard: React.FC<RegistrationWizardProps> = ({
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleDownloadReceiptPdf = async () => {
+    if (!submittedRegistration) return;
+    setIsDownloadingPdf(true);
+    try {
+      const sanitizedName = (submittedRegistration.student?.fullName || 'Peserta').replace(/[^a-zA-Z0-9]/g, '_');
+      const ok = await downloadElementAsPdf(
+        'spmb-printable-receipt',
+        `Bukti_Pendaftaran_SPMB_${submittedRegistration.registrationNumber}_${sanitizedName}.pdf`
+      );
+      if (!ok) {
+        setShowReceiptModal(true);
+      }
+    } catch (err: any) {
+      console.error(err);
+      alert('Gagal mengunduh file PDF secara otomatis: ' + (err.message || 'Error') + '. Silakan gunakan tombol Cetak.');
+    } finally {
+      setIsDownloadingPdf(false);
+    }
+  };
+
+  const handlePrintReceipt = () => {
+    setShowReceiptModal(true);
+    setTimeout(() => {
+      window.print();
+    }, 300);
   };
 
   const stepsList = [
@@ -557,7 +618,7 @@ export const RegistrationWizard: React.FC<RegistrationWizardProps> = ({
       <div className="flex items-center justify-between pb-4 mb-6 border-b border-stone-200">
         <div className="flex items-center gap-3">
           <img
-            src={schoolProfile.branding?.navbarLogoUrl || "/logo-sdit.png"}
+            src={schoolProfile.branding?.navbarLogoUrl || "/assets/aistudio/5_4164f3ac.png"}
             alt="Logo SDIT Insan Cendikia Kalibaru"
             className="w-10 h-10 object-contain rounded-lg p-1 bg-white border border-stone-200"
             onError={(e) => {
@@ -598,6 +659,23 @@ export const RegistrationWizard: React.FC<RegistrationWizardProps> = ({
             className="bg-[#123B35] h-full transition-all duration-300"
             style={{ width: `${(currentStep / 6) * 100}%` }}
           />
+        </div>
+
+        {/* Mobile Mini Step Pills */}
+        <div className="flex md:hidden items-center justify-between gap-1.5 mt-2.5 px-0.5">
+          {stepsList.map(step => (
+            <div
+              key={step.num}
+              className={`flex-1 h-1.5 rounded-full transition-all ${
+                currentStep === step.num
+                  ? 'bg-[#123B35] h-2 shadow-xs'
+                  : currentStep > step.num
+                  ? 'bg-emerald-600'
+                  : 'bg-stone-200'
+              }`}
+              title={`Langkah ${step.num}: ${step.title}`}
+            />
+          ))}
         </div>
 
         {/* Step icon tabs */}
@@ -1040,7 +1118,7 @@ export const RegistrationWizard: React.FC<RegistrationWizardProps> = ({
                     setErrorMessage('Mohon lengkapi seluruh kolom wajib pada Data Calon Murid.');
                   }
                 }}
-                className="px-6 py-2.5 bg-[#123B35] hover:bg-[#1a544b] text-white font-semibold rounded-lg shadow-xs transition-colors flex items-center gap-2 cursor-pointer"
+                className="w-full sm:w-auto px-6 py-3 bg-[#123B35] hover:bg-[#1a544b] text-white font-semibold rounded-xl shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer min-h-[44px]"
               >
                 <span>Lanjut ke Data Orang Tua / Wali</span>
                 <ChevronRight className="w-4 h-4 text-[#D5AA53]" />
@@ -1537,11 +1615,11 @@ export const RegistrationWizard: React.FC<RegistrationWizardProps> = ({
               )}
             </div>
 
-            <div className="pt-6 flex items-center justify-between border-t border-stone-100 mt-6">
+            <div className="pt-6 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 border-t border-stone-100 mt-6">
               <button
                 type="button"
                 onClick={() => setCurrentStep(1)}
-                className="px-4 py-2 border border-stone-300 rounded-lg text-stone-700 hover:bg-stone-50 flex items-center gap-1 cursor-pointer"
+                className="w-full sm:w-auto px-4 py-2.5 border border-stone-300 rounded-xl text-stone-700 hover:bg-stone-50 flex items-center justify-center gap-1 cursor-pointer min-h-[44px]"
               >
                 <ChevronLeft className="w-4 h-4" />
                 <span>Kembali</span>
@@ -1558,7 +1636,7 @@ export const RegistrationWizard: React.FC<RegistrationWizardProps> = ({
                     setErrorMessage('Mohon lengkapi seluruh data orang tua/wali yang bertanda bintang (*).');
                   }
                 }}
-                className="px-6 py-2.5 bg-[#123B35] hover:bg-[#1a544b] text-white font-semibold rounded-lg shadow-xs transition-colors flex items-center gap-2 cursor-pointer"
+                className="w-full sm:w-auto px-6 py-3 bg-[#123B35] hover:bg-[#1a544b] text-white font-semibold rounded-xl shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer min-h-[44px]"
               >
                 <span>Lanjut ke Tempat Tinggal Calon Siswa</span>
                 <ChevronRight className="w-4 h-4 text-[#D5AA53]" />
@@ -1892,11 +1970,11 @@ export const RegistrationWizard: React.FC<RegistrationWizardProps> = ({
               </div>
             </div>
 
-            <div className="pt-6 flex items-center justify-between border-t border-stone-100 mt-6">
+            <div className="pt-6 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 border-t border-stone-100 mt-6">
               <button
                 type="button"
                 onClick={() => setCurrentStep(2)}
-                className="px-4 py-2 border border-stone-300 rounded-lg text-stone-700 hover:bg-stone-50 flex items-center gap-1 cursor-pointer"
+                className="w-full sm:w-auto px-4 py-2.5 border border-stone-300 rounded-xl text-stone-700 hover:bg-stone-50 flex items-center justify-center gap-1 cursor-pointer min-h-[44px]"
               >
                 <ChevronLeft className="w-4 h-4" />
                 <span>Kembali</span>
@@ -1913,7 +1991,7 @@ export const RegistrationWizard: React.FC<RegistrationWizardProps> = ({
                     setErrorMessage('Mohon lengkapi seluruh data tempat tinggal calon siswa.');
                   }
                 }}
-                className="px-6 py-2.5 bg-[#123B35] hover:bg-[#1a544b] text-white font-semibold rounded-lg shadow-xs transition-colors flex items-center gap-2 cursor-pointer"
+                className="w-full sm:w-auto px-6 py-3 bg-[#123B35] hover:bg-[#1a544b] text-white font-semibold rounded-xl shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer min-h-[44px]"
               >
                 <span>Lanjut ke Upload Berkas & Pembayaran</span>
                 <ChevronRight className="w-4 h-4 text-[#D5AA53]" />
@@ -2354,11 +2432,11 @@ export const RegistrationWizard: React.FC<RegistrationWizardProps> = ({
               </div>
             </div>
 
-            <div className="pt-6 flex items-center justify-between border-t border-stone-100 mt-6">
+            <div className="pt-6 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 border-t border-stone-100 mt-6">
               <button
                 type="button"
                 onClick={() => setCurrentStep(3)}
-                className="px-4 py-2 border border-stone-300 rounded-lg text-stone-700 hover:bg-stone-50 flex items-center gap-1 cursor-pointer"
+                className="w-full sm:w-auto px-4 py-2.5 border border-stone-300 rounded-xl text-stone-700 hover:bg-stone-50 flex items-center justify-center gap-1 cursor-pointer min-h-[44px]"
               >
                 <ChevronLeft className="w-4 h-4" />
                 <span>Kembali</span>
@@ -2375,7 +2453,7 @@ export const RegistrationWizard: React.FC<RegistrationWizardProps> = ({
                     setErrorMessage('Mohon lengkapi seluruh dokumen wajib dan unggah bukti pembayaran biaya pendaftaran Rp50.000,-');
                   }
                 }}
-                className="px-6 py-2.5 bg-[#123B35] hover:bg-[#1a544b] text-white font-semibold rounded-lg shadow-xs transition-colors flex items-center gap-2 cursor-pointer"
+                className="w-full sm:w-auto px-6 py-3 bg-[#123B35] hover:bg-[#1a544b] text-white font-semibold rounded-xl shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer min-h-[44px]"
               >
                 <span>Lanjut ke Tinjau Data Pendaftaran</span>
                 <ChevronRight className="w-4 h-4 text-[#D5AA53]" />
@@ -2595,11 +2673,11 @@ export const RegistrationWizard: React.FC<RegistrationWizardProps> = ({
               </label>
             </div>
 
-            <div className="pt-6 flex items-center justify-between border-t border-stone-100 mt-6">
+            <div className="pt-6 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 border-t border-stone-100 mt-6">
               <button
                 type="button"
                 onClick={() => setCurrentStep(4)}
-                className="px-4 py-2 border border-stone-300 rounded-lg text-stone-700 hover:bg-stone-50 flex items-center gap-1 cursor-pointer"
+                className="w-full sm:w-auto px-4 py-2.5 border border-stone-300 rounded-xl text-stone-700 hover:bg-stone-50 flex items-center justify-center gap-1 cursor-pointer min-h-[44px]"
               >
                 <ChevronLeft className="w-4 h-4" />
                 <span>Kembali</span>
@@ -2609,7 +2687,7 @@ export const RegistrationWizard: React.FC<RegistrationWizardProps> = ({
                 type="button"
                 disabled={isSubmitting || !agreementChecked}
                 onClick={handleFinalSubmit}
-                className="px-8 py-3 bg-[#123B35] hover:bg-[#1a544b] text-white font-bold rounded-xl shadow-md transition-colors flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                className="w-full sm:w-auto px-8 py-3 bg-[#123B35] hover:bg-[#1a544b] text-white font-bold rounded-xl shadow-md transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 min-h-[44px]"
               >
                 <Send className="w-4 h-4 text-[#D5AA53]" />
                 <span>{isSubmitting ? 'Mengirim Pendaftaran...' : 'Kirim Pendaftaran Resmi'}</span>
@@ -2620,37 +2698,171 @@ export const RegistrationWizard: React.FC<RegistrationWizardProps> = ({
       )}
 
       {/* ========================================================================= */}
-      {/* STEP 6: BUKTI PENDAFTARAN RESMI & NOMOR REGISTRASI */}
+      {/* STEP 6: BUKTI PENDAFTARAN RESMI DENGAN 9 URUTAN LENGKAP & GRUP WHATSAPP */}
       {/* ========================================================================= */}
       {currentStep === 6 && submittedRegistration && (
-        <div className="bg-white rounded-3xl border border-stone-200 p-6 sm:p-10 shadow-lg text-center space-y-6">
-          <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto text-emerald-700">
-            <CheckCircle2 className="w-10 h-10" />
-          </div>
+        <div className="bg-white rounded-3xl border border-stone-200 p-5 sm:p-8 md:p-10 shadow-lg text-center space-y-6">
+          {/* 1. NOTIFIKASI PENDAFTARAN BERHASIL */}
+          <div className="space-y-3">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto text-emerald-700 shadow-sm border border-emerald-200">
+              <CheckCircle2 className="w-10 h-10 sm:w-12 sm:h-12" />
+            </div>
 
-          <div className="space-y-2">
-            <h3 className="text-2xl font-bold text-stone-900 font-serif">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-800 rounded-full text-xs font-bold border border-emerald-200">
+              <Check className="w-3.5 h-3.5" />
+              <span>Pendaftaran Berhasil Disimpan</span>
+            </div>
+
+            <h3 className="text-2xl sm:text-3xl font-bold text-stone-900 font-serif leading-tight">
               Alhamdulillah, Pendaftaran Berhasil Dikirim!
             </h3>
-            <p className="text-xs text-stone-600 max-w-lg mx-auto">
-              Data ananda <strong>{submittedRegistration.student.fullName}</strong> dan bukti pembayaran biaya pendaftaran resmi Rp50.000,- telah tersimpan dalam sistem SPMB.
+            <p className="text-xs sm:text-sm text-stone-600 max-w-lg mx-auto">
+              Data formulir calon siswa baru dan bukti pembayaran resmi biaya pendaftaran Rp50.000,- telah tersimpan dalam sistem SPMB {schoolProfile.name}.
             </p>
           </div>
 
-          {/* Registration Code Banner */}
-          <div className="max-w-md mx-auto p-5 rounded-2xl bg-[#F7F8F5] border-2 border-[#123B35]/20 shadow-xs space-y-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-stone-500">
-              Nomor Pendaftaran Resmi Anda:
-            </span>
-            <div className="text-2xl sm:text-3xl font-mono font-black text-[#123B35] tracking-wider">
-              {submittedRegistration.registrationNumber}
+          {/* KARTU INFORMASI BUKTI PENDAFTARAN (URUTAN 2, 3, 4, 5) */}
+          <div className="max-w-xl mx-auto w-full bg-[#F7F8F5] border-2 border-[#123B35]/20 rounded-2xl p-4 sm:p-6 shadow-xs space-y-4 text-left">
+            {/* 2. NOMOR PENDAFTARAN */}
+            <div className="pb-3 border-b border-stone-200 text-center">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-stone-500 block mb-1">
+                2. Nomor Pendaftaran Resmi
+              </span>
+              <div className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-white border border-[#123B35]/30 rounded-xl shadow-xs">
+                <span className="text-2xl sm:text-3xl font-mono font-black text-[#123B35] tracking-wider">
+                  {submittedRegistration.registrationNumber}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigator.clipboard.writeText(submittedRegistration.registrationNumber);
+                    setCopiedRegNumber(true);
+                    setTimeout(() => setCopiedRegNumber(false), 2000);
+                  }}
+                  className="p-1.5 text-stone-400 hover:text-stone-700 rounded-lg hover:bg-stone-100 transition-colors cursor-pointer"
+                  title="Salin nomor pendaftaran"
+                >
+                  {copiedRegNumber ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
+                </button>
+              </div>
+              <div className="text-[11px] text-stone-500 pt-1">
+                Status Verifikasi: <span className="text-amber-700 font-bold">Menunggu Verifikasi Berkas & Pembayaran</span>
+              </div>
             </div>
-            <div className="text-[11px] text-stone-600 font-medium pt-1">
-              Status Pembayaran: <span className="text-sky-700 font-bold">Menunggu Verifikasi</span>
+
+            {/* 3. NAMA CALON SISWA */}
+            <div className="bg-white p-3.5 rounded-xl border border-stone-200">
+              <span className="text-[11px] font-medium text-stone-500 block">
+                3. Nama Calon Siswa
+              </span>
+              <span className="text-base sm:text-lg font-bold text-stone-900 block pt-0.5">
+                {submittedRegistration.student?.fullName || student.fullName}
+              </span>
+              {submittedRegistration.student?.nickname && (
+                <span className="text-xs text-stone-500">
+                  Nama Panggilan: <strong>{submittedRegistration.student.nickname}</strong>
+                </span>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* 4. GELOMBANG PENDAFTARAN */}
+              <div className="bg-white p-3.5 rounded-xl border border-stone-200">
+                <span className="text-[11px] font-medium text-stone-500 block">
+                  4. Gelombang Pendaftaran
+                </span>
+                <span className="text-sm sm:text-base font-bold text-[#123B35] block pt-0.5">
+                  {submittedRegistration.waveName || 'Gelombang 1'}
+                </span>
+              </div>
+
+              {/* 5. TANGGAL PENDAFTARAN */}
+              <div className="bg-white p-3.5 rounded-xl border border-stone-200">
+                <span className="text-[11px] font-medium text-stone-500 block">
+                  5. Tanggal Pendaftaran
+                </span>
+                <span className="text-sm sm:text-base font-semibold text-stone-800 block pt-0.5">
+                  {formatDateId(submittedRegistration.submittedAt || new Date().toISOString())}
+                </span>
+              </div>
             </div>
           </div>
 
-          {/* Critical Parent Instructions */}
+          {/* AKSI CETAK & UNDUH PDF (URUTAN 6 & 7) */}
+          <div className="max-w-xl mx-auto w-full space-y-2">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-stone-500 block text-center">
+              Dokumen Bukti Pendaftaran
+            </span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* 6. TOMBOL UNDUH BUKTI PENDAFTARAN PDF */}
+              <button
+                type="button"
+                onClick={handleDownloadReceiptPdf}
+                disabled={isDownloadingPdf}
+                className="w-full px-4 py-3.5 bg-[#174C80] hover:bg-[#2065AA] text-white text-xs sm:text-sm font-bold rounded-xl shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 min-h-[46px]"
+                title="Unduh berkas PDF bukti pendaftaran resmi"
+              >
+                {isDownloadingPdf ? (
+                  <Loader2 className="w-4 h-4 animate-spin text-[#D5AA53]" />
+                ) : (
+                  <Download className="w-4 h-4 text-[#D5AA53]" />
+                )}
+                <span>{isDownloadingPdf ? 'Membuat PDF...' : 'Unduh Bukti Pendaftaran (PDF)'}</span>
+              </button>
+
+              {/* 7. TOMBOL CETAK BUKTI PENDAFTARAN */}
+              <button
+                type="button"
+                onClick={handlePrintReceipt}
+                className="w-full px-4 py-3.5 bg-[#123B35] hover:bg-[#1a544b] text-white text-xs sm:text-sm font-bold rounded-xl shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer min-h-[46px]"
+                title="Cetak langsung bukti pendaftaran lewat printer"
+              >
+                <Printer className="w-4 h-4 text-[#D5AA53]" />
+                <span>Cetak Bukti Pendaftaran</span>
+              </button>
+            </div>
+          </div>
+
+          {/* URUTAN 8 & 9: GRUP WHATSAPP RESMI SPMB */}
+          {whatsAppGroup?.isActive && Boolean((whatsAppGroup.inviteLink || whatsAppGroup.groupLink)?.trim()) && (
+            <div className="max-w-xl mx-auto w-full bg-linear-to-b from-[#F0FDF4] to-[#E6F9EE] border-2 border-[#25D366] rounded-2xl p-5 sm:p-6 shadow-md text-left space-y-4">
+              {/* 8. INFORMASI AJAKAN BERGABUNG KE GRUP WHATSAPP */}
+              <div className="flex items-start gap-3.5">
+                <div className="w-11 h-11 rounded-2xl bg-[#25D366] text-white flex items-center justify-center shrink-0 shadow-sm">
+                  <WhatsAppIcon className="w-6 h-6 fill-white" />
+                </div>
+                <div className="space-y-1.5 flex-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-xs font-black text-emerald-950 uppercase tracking-wide">
+                      {whatsAppGroup.groupName || 'Grup WhatsApp Resmi SPMB'}
+                    </span>
+                    <span className="px-2 py-0.5 bg-emerald-200 text-emerald-900 rounded-full text-[10px] font-bold">
+                      Resmi SDIT
+                    </span>
+                  </div>
+                  <p className="text-xs sm:text-sm text-stone-800 leading-relaxed font-normal">
+                    {whatsAppGroup.infoMessage ||
+                      'Terima kasih telah mendaftar di SDIT INSAN CENDIKIA KALIBARU. Silakan bergabung dengan Grup WhatsApp Resmi SPMB untuk memperoleh informasi terbaru mengenai tahapan dan proses penerimaan siswa baru.'}
+                  </p>
+                </div>
+              </div>
+
+              {/* 9. TOMBOL GABUNG GRUP WHATSAPP SPMB */}
+              <a
+                href={(whatsAppGroup.inviteLink || whatsAppGroup.groupLink || '').trim()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full py-4 px-6 bg-[#25D366] hover:bg-[#20ba59] active:bg-[#1da850] text-white font-black text-sm sm:text-base rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2.5 cursor-pointer text-center tracking-wide"
+                title="Buka tautan undangan Grup WhatsApp resmi SPMB di tab baru"
+              >
+                <WhatsAppIcon className="w-5 h-5 fill-white shrink-0" />
+                <span>GABUNG GRUP WHATSAPP SPMB</span>
+                <ExternalLink className="w-4 h-4 text-emerald-100 shrink-0" />
+              </a>
+            </div>
+          )}
+
+          {/* Petunjuk Penting Tambahan Untuk Wali Murid */}
           <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-stone-800 text-xs text-left space-y-2 max-w-xl mx-auto">
             <div className="flex items-center gap-2 font-bold text-amber-900">
               <Info className="w-4 h-4 text-amber-700 shrink-0" />
@@ -2658,10 +2870,10 @@ export const RegistrationWizard: React.FC<RegistrationWizardProps> = ({
             </div>
             <ul className="list-disc pl-5 space-y-1 text-stone-700 text-[11px]">
               <li>
-                <strong>Simpan Nomor Pendaftaran ({submittedRegistration.registrationNumber})</strong> dan <strong>Tanggal Lahir ({submittedRegistration.student.birthDate})</strong> ananda.
+                <strong>Simpan Nomor Pendaftaran ({submittedRegistration.registrationNumber})</strong> dan <strong>Tanggal Lahir ({submittedRegistration.student?.birthDate || student.birthDate})</strong> ananda.
               </li>
               <li>
-                Gunakan kedua data tersebut di menu <strong>"Cek Status Pendaftaran"</strong> untuk memantau status verifikasi berkas dan verifikasi pembayaran secara berkala.
+                Gunakan nomor pendaftaran tersebut pada menu <strong>"Cek Status Pendaftaran"</strong> untuk memantau status verifikasi berkas, observasi kesiapan belajar, dan pengumuman.
               </li>
               <li>
                 Panitia SPMB akan memverifikasi berkas dan bukti pembayaran dalam waktu 1-2 hari kerja.
@@ -2669,26 +2881,42 @@ export const RegistrationWizard: React.FC<RegistrationWizardProps> = ({
             </ul>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-            <button
-              onClick={() => setShowReceiptModal(true)}
-              className="w-full sm:w-auto px-6 py-3 bg-[#123B35] hover:bg-[#1a544b] text-white text-xs font-semibold rounded-xl shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
-            >
-              <Printer className="w-4 h-4 text-[#D5AA53]" />
-              <span>Cetak / Unduh Bukti Pendaftaran (PDF)</span>
-            </button>
-
+          {/* Navigasi Lanjutan */}
+          <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3 max-w-xl mx-auto">
             {onNavigateToCheckStatus && (
               <button
+                type="button"
                 onClick={() => onNavigateToCheckStatus(submittedRegistration.registrationNumber)}
-                className="w-full sm:w-auto px-6 py-3 bg-[#174C80] hover:bg-[#2065AA] text-white text-xs font-semibold rounded-xl shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full sm:w-auto px-6 py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-semibold rounded-xl transition-colors flex items-center justify-center gap-2 cursor-pointer"
               >
-                <Search className="w-4 h-4 text-[#D5AA53]" />
+                <Search className="w-4 h-4 text-[#174C80]" />
                 <span>Cek Status Pendaftaran Sekarang</span>
               </button>
             )}
+
+            {onExit && (
+              <button
+                type="button"
+                onClick={onExit}
+                className="w-full sm:w-auto px-6 py-2.5 border border-stone-300 hover:bg-stone-50 text-stone-700 text-xs font-semibold rounded-xl transition-colors flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <span>Kembali ke Beranda SPMB</span>
+              </button>
+            )}
           </div>
+        </div>
+      )}
+
+      {/* Off-screen Rendered Receipt for instantaneous PDF Generation */}
+      {submittedRegistration && (
+        <div
+          aria-hidden="true"
+          className="fixed -left-[99999px] top-0 pointer-events-none opacity-0 overflow-hidden w-[820px]"
+        >
+          <RegistrationReceipt
+            registration={submittedRegistration}
+            schoolProfile={schoolProfile}
+          />
         </div>
       )}
 

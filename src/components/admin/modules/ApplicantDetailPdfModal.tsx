@@ -264,14 +264,15 @@ export const ApplicantDetailPdfModal: React.FC<ApplicantDetailPdfModalProps> = (
         </div>
 
         {/* Scrollable Content Container */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-8 bg-[#F7F8F5]">
+        <div className="flex-1 overflow-y-auto p-3 sm:p-8 bg-[#F7F8F5]">
           {/* TAB 1: Official Printable Document (PDF Layout) */}
           {activeTab === 'preview' && (
-            <div
-              id="spmb-printable-receipt"
-              style={{ transform: `scale(${zoomScale})`, transformOrigin: 'top center', transition: 'transform 0.15s ease' }}
-              className="bg-white rounded-2xl border border-stone-300 p-8 shadow-sm text-stone-900 font-sans text-xs"
-            >
+            <div className="overflow-x-auto pb-6">
+              <div
+                id="spmb-printable-receipt"
+                style={{ transform: `scale(${zoomScale})`, transformOrigin: 'top center', transition: 'transform 0.15s ease' }}
+                className="bg-white rounded-2xl border border-stone-300 p-5 sm:p-8 shadow-sm text-stone-900 font-sans text-xs min-w-[560px] sm:min-w-0 mx-auto"
+              >
               {/* Kop Surat Resmi */}
               <div className="flex items-center gap-4 pb-4 border-b-2 border-stone-800 mb-6">
                 {logoUrl ? (
@@ -701,6 +702,7 @@ export const ApplicantDetailPdfModal: React.FC<ApplicantDetailPdfModalProps> = (
                   </p>
                 </div>
               </div>
+            </div>
             </div>
           )}
 

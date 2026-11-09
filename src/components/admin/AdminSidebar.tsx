@@ -132,7 +132,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
           <img
             src={branding.mainLogoUrl}
             alt="Logo Sekolah"
-            className="w-9 h-9 object-contain rounded-lg bg-white/10 p-1 shrink-0"
+            className="w-9 h-9 object-contain rounded-lg bg-white p-1 shrink-0 shadow-xs"
           />
         ) : (
           <div className="w-9 h-9 rounded-lg bg-[#D5AA53] flex items-center justify-center font-bold text-[#123B35] shrink-0 text-sm">

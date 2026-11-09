@@ -144,11 +144,11 @@ export const RegistrationsList: React.FC<RegistrationsListProps> = ({
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2.5">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full sm:w-auto">
           <button
             type="button"
             onClick={() => setShowBulkPrintModal(true)}
-            className="inline-flex items-center gap-2 px-3.5 py-2 bg-[#123B35] hover:bg-[#1a544b] text-white text-xs font-semibold rounded-lg shadow-xs transition-colors cursor-pointer"
+            className="inline-flex items-center justify-center gap-2 px-3.5 py-2.5 bg-[#123B35] hover:bg-[#1a544b] text-white text-xs font-semibold rounded-xl shadow-xs transition-colors cursor-pointer min-h-[40px]"
             title="Cetak tabel rekapitulasi seluruh pendaftar yang tersaring"
           >
             <Printer className="w-4 h-4 text-[#D5AA53]" />
@@ -158,7 +158,7 @@ export const RegistrationsList: React.FC<RegistrationsListProps> = ({
           <button
             type="button"
             onClick={exportToExcel}
-            className="inline-flex items-center gap-2 px-3.5 py-2 bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-semibold rounded-lg shadow-xs transition-colors cursor-pointer"
+            className="inline-flex items-center justify-center gap-2 px-3.5 py-2.5 bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-semibold rounded-xl shadow-xs transition-colors cursor-pointer min-h-[40px]"
             title="Download file Excel (.xlsx / .csv) data pendaftar tersaring"
           >
             <FileSpreadsheet className="w-4 h-4 text-[#D5AA53]" />

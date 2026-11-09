@@ -500,9 +500,21 @@ export const api = {
     return data;
   },
 
-  // WhatsApp Group Settings (CMS)
+  // WhatsApp Group Settings (CMS & Public)
   async getWhatsAppSettings(): Promise<WhatsAppGroupSettings> {
     const res = await fetch(`${BASE_URL}/cms/whatsapp`);
+    return await res.json();
+  },
+
+  async getPublicWhatsAppGroup(): Promise<{
+    groupName: string;
+    inviteLink: string;
+    groupLink?: string;
+    isActive: boolean;
+    infoMessage: string;
+    updatedAt?: string;
+  }> {
+    const res = await fetch(`${BASE_URL}/spmb/whatsapp-group`);
     return await res.json();
   },
 

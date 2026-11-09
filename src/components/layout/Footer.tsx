@@ -32,7 +32,7 @@ export const Footer: React.FC<FooterProps> = ({
                 <img
                   src={schoolProfile.branding?.footerLogoUrl || schoolProfile.branding?.mainLogoUrl}
                   alt={schoolProfile.name}
-                  className="h-10 w-auto max-w-[120px] object-contain rounded-lg bg-white/10 p-1 shrink-0"
+                  className="h-11 w-auto max-w-[140px] object-contain rounded-lg bg-white p-1 shrink-0 shadow-xs"
                 />
               ) : (
                 <div className="w-10 h-10 rounded-xl bg-[#D5AA53] flex items-center justify-center font-bold text-[#123B35] text-base shrink-0 shadow-xs">

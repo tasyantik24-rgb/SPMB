@@ -7,6 +7,7 @@ import express, { Request, Response } from 'express';
 import { createServer as createViteServer } from 'vite';
 import path from 'path';
 import fs from 'fs';
+import crypto from 'crypto';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import {
@@ -95,6 +96,10 @@ function getInitialDatabase(): AppDatabase {
       isDraft: false
     }
   };
+}
+
+function hashPassword(password: string): string {
+  return crypto.createHash('sha256').update(String(password || '') + '_sdit_insan_cendikia_salt_2027').digest('hex');
 }
 
 function loadDatabase(): AppDatabase {
@@ -196,6 +201,16 @@ function loadDatabase(): AppDatabase {
             kepala_sekolah: 'Kepala Sekolah'
           };
           u.jabatan = roleLabels[u.role] || 'Staf Sekolah';
+          changed = true;
+        }
+        // Ensure passwordHash exists and delete plain text password
+        if (!u.passwordHash) {
+          const plain = u.password || 'SditInsan2027!';
+          u.passwordHash = hashPassword(plain);
+          delete u.password;
+          changed = true;
+        } else if (u.password) {
+          delete u.password;
           changed = true;
         }
       });
@@ -593,6 +608,25 @@ async function startServer() {
         (u.email && u.email.toLowerCase() === loginKey) || 
         (u.username && u.username.toLowerCase() === loginKey)
       );
+
+      // Verify password securely when logging in with identifier + password
+      if (user && password) {
+        const hashedInput = hashPassword(String(password));
+        const isMatch = (user.passwordHash && user.passwordHash === hashedInput) ||
+                        (!user.passwordHash && user.password && user.password === password) ||
+                        (!user.passwordHash && !user.password && (password === 'SditInsan2027!' || password === 'admin123'));
+
+        if (!isMatch) {
+          limitRecord.attempts += 1;
+          if (limitRecord.attempts >= 5) {
+            limitRecord.blockedUntil = now + 15 * 60 * 1000;
+          }
+          loginRateLimits.set(rateLimitKey, limitRecord);
+          return res.status(401).json({
+            error: 'Kata sandi (password) atau username/email salah. Silakan coba kembali atau hubungi Super Admin.'
+          });
+        }
+      }
     }
 
     // Role switcher helper for internal roles only
@@ -1236,18 +1270,34 @@ async function startServer() {
     });
   });
 
+  // Public WhatsApp Group Info for Registration & Confirmation
+  app.get('/api/spmb/whatsapp-group', (req: Request, res: Response) => {
+    const wa = db.whatsappSettings || INITIAL_WHATSAPP_SETTINGS;
+    const finalLink = wa.inviteLink || wa.groupLink || '';
+    res.json({
+      groupName: wa.groupName || 'Grup Resmi SPMB SDIT INSAN CENDIKIA KALIBARU',
+      inviteLink: finalLink,
+      groupLink: finalLink,
+      isActive: Boolean(wa.isActive),
+      infoMessage: wa.infoMessage || 'Terima kasih telah mendaftar di SDIT INSAN CENDIKIA KALIBARU. Silakan bergabung dengan Grup WhatsApp Resmi SPMB untuk memperoleh informasi terbaru mengenai tahapan dan proses penerimaan siswa baru.',
+      updatedAt: wa.updatedAt
+    });
+  });
+
   // CMS WhatsApp Group Settings
   app.get('/api/cms/whatsapp', (req: Request, res: Response) => {
     res.json(db.whatsappSettings);
   });
 
   app.put('/api/cms/whatsapp', (req: Request, res: Response) => {
-    const { groupName, inviteLink, isActive, allowedStatuses, infoMessage, updatedBy, notes } = req.body;
+    const { groupName, inviteLink, groupLink, isActive, allowedStatuses, infoMessage, updatedBy, notes } = req.body;
 
     const current = db.whatsappSettings || INITIAL_WHATSAPP_SETTINGS;
+    const resolvedLink = inviteLink !== undefined ? inviteLink : (groupLink !== undefined ? groupLink : (current.inviteLink || current.groupLink || ''));
+
     const historyItem = {
       id: `wahist-${Date.now()}`,
-      link: inviteLink !== undefined ? inviteLink : current.inviteLink,
+      link: resolvedLink,
       changedBy: updatedBy || 'Super Admin',
       changedAt: new Date().toISOString(),
       notes: notes || 'Pembaruan konfigurasi grup WhatsApp SPMB'
@@ -1256,7 +1306,8 @@ async function startServer() {
     const updated = {
       ...current,
       groupName: groupName !== undefined ? groupName : current.groupName,
-      inviteLink: inviteLink !== undefined ? inviteLink : current.inviteLink,
+      inviteLink: resolvedLink,
+      groupLink: resolvedLink,
       isActive: isActive !== undefined ? Boolean(isActive) : current.isActive,
       allowedStatuses: allowedStatuses || current.allowedStatuses,
       infoMessage: infoMessage !== undefined ? infoMessage : current.infoMessage,
@@ -2694,12 +2745,12 @@ async function startServer() {
 
   app.put('/api/cms/branding', (req: Request, res: Response) => {
     const current = db.schoolProfile.branding || {
-      mainLogoUrl: '',
-      faviconUrl: '',
-      navbarLogoUrl: '',
-      footerLogoUrl: '',
-      loginLogoUrl: '',
-      receiptLogoUrl: '',
+      mainLogoUrl: '/assets/aistudio/5_4164f3ac.png',
+      faviconUrl: '/assets/aistudio/5_4164f3ac.png',
+      navbarLogoUrl: '/assets/aistudio/5_4164f3ac.png',
+      footerLogoUrl: '/assets/aistudio/5_4164f3ac.png',
+      loginLogoUrl: '/assets/aistudio/5_4164f3ac.png',
+      receiptLogoUrl: '/assets/aistudio/5_4164f3ac.png',
       heroBannerUrl: '',
       spmbBannerUrl: '',
       logoScale: 100,
