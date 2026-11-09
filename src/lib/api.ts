@@ -431,7 +431,7 @@ export const api = {
     const res = await fetch(`${BASE_URL}/cms/users`);
     return await res.json();
   },
-  async saveUser(user: Partial<User>): Promise<User> {
+  async saveUser(user: Partial<User> & { password?: string }): Promise<User & { temporaryPassword?: string }> {
     const isEdit = !!user.id;
     const url = isEdit ? `${BASE_URL}/cms/users/${user.id}` : `${BASE_URL}/cms/users`;
     const res = await fetch(url, {
@@ -439,7 +439,11 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(user)
     });
-    return await res.json();
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error || 'Gagal menyimpan data pengguna.');
+    }
+    return data;
   },
   async deleteUser(id: string): Promise<void> {
     await fetch(`${BASE_URL}/cms/users/${id}`, { method: 'DELETE' });
@@ -546,7 +550,7 @@ export const api = {
   },
 
   // Reset User Password by Super Admin
-  async resetUserPassword(userId: string, newPassword: string, adminName?: string): Promise<{ success: boolean; message: string }> {
+  async resetUserPassword(userId: string, newPassword: string, adminName?: string): Promise<{ success: boolean; temporaryPassword?: string; message: string }> {
     const res = await fetch(`${BASE_URL}/cms/users/${userId}/reset-password`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -555,6 +559,20 @@ export const api = {
     const data = await res.json();
     if (!res.ok) {
       throw new Error(data.error || 'Gagal mereset kata sandi pengguna.');
+    }
+    return data;
+  },
+
+  // Change User Password by Super Admin (dedicated endpoint without touching other profile data)
+  async changeUserPassword(userId: string, newPassword: string, adminName?: string): Promise<{ success: boolean; temporaryPassword?: string; message: string }> {
+    const res = await fetch(`${BASE_URL}/cms/users/${userId}/change-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ newPassword, adminName })
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error || 'Gagal memperbarui kata sandi pengguna.');
     }
     return data;
   },

@@ -205,7 +205,7 @@ function loadDatabase(): AppDatabase {
         }
         // Ensure passwordHash exists and delete plain text password
         if (!u.passwordHash) {
-          const plain = u.password || 'SditInsan2027!';
+          const plain = u.password || (u.id === 'usr-superadmin' || u.role === 'super_admin' ? '12341234' : 'SditInsan2027!');
           u.passwordHash = hashPassword(plain);
           delete u.password;
           changed = true;
@@ -1926,7 +1926,9 @@ async function startServer() {
     const allowedRoles = ['super_admin', 'admin_sekolah', 'panitia_spmb', 'tim_seleksi', 'kepala_sekolah'];
     const assignedRole = allowedRoles.includes(role) ? role : 'panitia_spmb';
 
-    const newUser = {
+    const plainPassword = password && String(password).trim().length >= 6 ? String(password).trim() : 'SditInsan2027!';
+
+    const newUser: any = {
       id: `usr-${Date.now()}`,
       username: cleanUsername,
       email: cleanEmail,
@@ -1937,7 +1939,8 @@ async function startServer() {
       avatarUrl: avatarUrl || '',
       isActive: isActive !== false,
       createdAt: new Date().toISOString(),
-      mustChangePassword: false
+      mustChangePassword: false,
+      passwordHash: hashPassword(plainPassword)
     };
 
     db.users.push(newUser);
@@ -1951,7 +1954,10 @@ async function startServer() {
       `Super Admin membuat akun petugas baru "${newUser.name}" (@${newUser.username}) dengan peran ${newUser.role}.`
     );
 
-    res.status(201).json(sanitizeUser(newUser));
+    res.status(201).json({
+      ...sanitizeUser(newUser),
+      temporaryPassword: plainPassword
+    });
   });
 
   app.put('/api/cms/users/:id', (req: Request, res: Response) => {
@@ -1995,13 +2001,18 @@ async function startServer() {
       }
     }
 
-    current.updatedAt = new Date().toISOString();
-    saveDatabase(db);
-
+    let updatedPasswordStr: string | null = null;
     let logDetail = `Super Admin memperbarui data akun @${current.username} (${current.name}).`;
     if (password && String(password).trim().length >= 6) {
+      updatedPasswordStr = String(password).trim();
+      current.passwordHash = hashPassword(updatedPasswordStr);
+      delete current.password;
+      current.mustChangePassword = false;
       logDetail += ' Kata sandi pengguna telah diatur ulang secara resmi.';
     }
+
+    current.updatedAt = new Date().toISOString();
+    saveDatabase(db);
 
     logActivity(
       'admin',
@@ -2011,7 +2022,10 @@ async function startServer() {
       logDetail
     );
 
-    res.json(sanitizeUser(current));
+    res.json({
+      ...sanitizeUser(current),
+      ...(updatedPasswordStr ? { temporaryPassword: updatedPasswordStr } : {})
+    });
   });
 
   // Dedicated Password Reset Endpoint by Super Admin
@@ -2026,7 +2040,9 @@ async function startServer() {
       return res.status(400).json({ error: 'Password baru minimal harus 6 karakter.' });
     }
 
-    user.password = newPassword;
+    const cleanPass = String(newPassword).trim();
+    user.passwordHash = hashPassword(cleanPass);
+    delete user.password;
     user.mustChangePassword = true;
     user.updatedAt = new Date().toISOString();
     saveDatabase(db);
@@ -2041,8 +2057,42 @@ async function startServer() {
 
     res.json({
       success: true,
-      temporaryPassword: newPassword,
+      temporaryPassword: cleanPass,
       message: `Kata sandi akun @${user.username} berhasil diatur ulang. Petugas dapat masuk menggunakan kata sandi baru ini.`
+    });
+  });
+
+  // Dedicated Password Change Endpoint by Super Admin (without modifying other user data)
+  app.post('/api/cms/users/:id/change-password', (req: Request, res: Response) => {
+    const idx = db.users.findIndex(u => u.id === req.params.id);
+    if (idx === -1) return res.status(404).json({ error: 'Pengguna tidak ditemukan' });
+
+    const user = db.users[idx];
+    const { newPassword, adminName } = req.body;
+
+    if (!newPassword || String(newPassword).length < 6) {
+      return res.status(400).json({ error: 'Password baru minimal harus 6 karakter.' });
+    }
+
+    const cleanPass = String(newPassword).trim();
+    user.passwordHash = hashPassword(cleanPass);
+    delete user.password;
+    user.mustChangePassword = false;
+    user.updatedAt = new Date().toISOString();
+    saveDatabase(db);
+
+    logActivity(
+      'admin',
+      adminName || 'Super Admin',
+      'super_admin',
+      'Ubah Password Petugas',
+      `Super Admin berhasil memperbarui kata sandi untuk akun @${user.username} (${user.name}).`
+    );
+
+    res.json({
+      success: true,
+      temporaryPassword: cleanPass,
+      message: `Password akun @${user.username} (${user.name}) berhasil diperbarui secara aman.`
     });
   });
 

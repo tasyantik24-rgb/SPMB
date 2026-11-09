@@ -240,8 +240,11 @@ export const LoginModal: React.FC<LoginModalProps> = ({
 
           {/* Notice: Internal School Only */}
           <div className="bg-amber-50/80 border border-amber-200/80 rounded-xl p-3 text-[11px] text-amber-900 leading-relaxed">
-            <span className="font-bold block text-amber-950 mb-0.5">Catatan Hak Akses:</span>
-            Halaman login ini khusus bagi tenaga kependidikan dan panitia SPMB resmi SDIT Insan Cendikia Kalibaru. Wali murid tidak perlu membuat akun dan dapat langsung mengecek perkembangan pendaftaran melalui menu <strong>Cek Status Pendaftaran</strong>.
+            <span className="font-bold block text-amber-950 mb-0.5">Catatan Hak Akses Petugas:</span>
+            Halaman login ini khusus bagi tenaga kependidikan dan panitia SPMB resmi SDIT Insan Cendikia Kalibaru.
+            <div className="mt-1.5 pt-1.5 border-t border-amber-200/80 text-[10px] text-amber-800">
+              Super Admin: username <strong className="font-mono font-bold text-amber-950">admin_utama</strong> atau email <strong className="font-mono text-amber-950">admin@sdit-insancendikia.sch.id</strong> (Password: <strong className="font-mono font-bold text-amber-950">12341234</strong>).
+            </div>
           </div>
 
           {/* Quick Demo Switcher (5 Internal Roles Only) */}

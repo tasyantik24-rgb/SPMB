@@ -665,7 +665,10 @@
       "isActive": true,
       "phone": "081234567800",
       "createdAt": "2026-01-01T08:00:00Z",
-      "lastLoginAt": "2026-11-02T10:15:00Z"
+      "lastLoginAt": "2026-11-09T11:38:16.822Z",
+      "passwordHash": "a9c9e8f6b635aebc9793ce8dd075b0520643400024928b2fa6e924274152421f",
+      "mustChangePassword": false,
+      "updatedAt": "2026-11-09T11:37:15.783Z"
     },
     {
       "id": "usr-adminsekolah",
@@ -678,7 +681,8 @@
       "isActive": true,
       "phone": "081234567801",
       "createdAt": "2026-01-05T09:00:00Z",
-      "lastLoginAt": "2026-11-01T14:30:00Z"
+      "lastLoginAt": "2026-11-01T14:30:00Z",
+      "passwordHash": "12a04210b3a927ff7068364e5f1214a47ea561efb319e5e16b24c3c0398b1428"
     },
     {
       "id": "usr-panitia",
@@ -691,7 +695,8 @@
       "isActive": true,
       "phone": "081234567802",
       "createdAt": "2026-01-10T10:00:00Z",
-      "lastLoginAt": "2026-11-02T11:45:00Z"
+      "lastLoginAt": "2026-11-02T11:45:00Z",
+      "passwordHash": "12a04210b3a927ff7068364e5f1214a47ea561efb319e5e16b24c3c0398b1428"
     },
     {
       "id": "usr-seleksi",
@@ -704,7 +709,8 @@
       "isActive": true,
       "phone": "081234567803",
       "createdAt": "2026-01-12T11:00:00Z",
-      "lastLoginAt": "2026-10-30T16:20:00Z"
+      "lastLoginAt": "2026-10-30T16:20:00Z",
+      "passwordHash": "12a04210b3a927ff7068364e5f1214a47ea561efb319e5e16b24c3c0398b1428"
     },
     {
       "id": "usr-kepsek",
@@ -717,7 +723,8 @@
       "isActive": true,
       "phone": "081234567804",
       "createdAt": "2026-01-02T08:30:00Z",
-      "lastLoginAt": "2026-11-02T07:45:00Z"
+      "lastLoginAt": "2026-11-02T07:45:00Z",
+      "passwordHash": "12a04210b3a927ff7068364e5f1214a47ea561efb319e5e16b24c3c0398b1428"
     }
   ],
   "registrations": [
@@ -1491,6 +1498,87 @@
     }
   ],
   "activityLogs": [
+    {
+      "id": "log-1794224296823",
+      "userId": "usr-superadmin",
+      "userName": "Ustadz Admin Utama",
+      "userRole": "super_admin",
+      "action": "User Login",
+      "details": "Petugas Ustadz Admin Utama (super_admin) berhasil masuk ke sistem.",
+      "timestamp": "2026-11-09T11:38:16.823Z"
+    },
+    {
+      "id": "log-1794224245315",
+      "userId": "usr-superadmin",
+      "userName": "Ustadz Admin Utama",
+      "userRole": "super_admin",
+      "action": "User Login",
+      "details": "Petugas Ustadz Admin Utama (super_admin) berhasil masuk ke sistem.",
+      "timestamp": "2026-11-09T11:37:25.315Z"
+    },
+    {
+      "id": "log-1794224240803",
+      "userId": "usr-superadmin",
+      "userName": "Ustadz Admin Utama",
+      "userRole": "super_admin",
+      "action": "User Login",
+      "details": "Petugas Ustadz Admin Utama (super_admin) berhasil masuk ke sistem.",
+      "timestamp": "2026-11-09T11:37:20.803Z"
+    },
+    {
+      "id": "log-1794224235784",
+      "userId": "admin",
+      "userName": "Super Admin",
+      "userRole": "super_admin",
+      "action": "Ubah Password Petugas",
+      "details": "Super Admin berhasil memperbarui kata sandi untuk akun @admin_utama (Ustadz Admin Utama).",
+      "timestamp": "2026-11-09T11:37:15.784Z"
+    },
+    {
+      "id": "log-1794223973838",
+      "userId": "admin",
+      "userName": "Super Admin",
+      "userRole": "super_admin",
+      "action": "Hapus Akun Petugas",
+      "details": "Super Admin menghapus permanen akun @petugas_test (Petugas Uji Coba).",
+      "timestamp": "2026-11-09T11:32:53.838Z"
+    },
+    {
+      "id": "log-1794223965972",
+      "userId": "usr-1794223918106",
+      "userName": "Petugas Uji Coba",
+      "userRole": "panitia_spmb",
+      "action": "User Login",
+      "details": "Petugas Petugas Uji Coba (panitia_spmb) berhasil masuk ke sistem.",
+      "timestamp": "2026-11-09T11:32:45.972Z"
+    },
+    {
+      "id": "log-1794223950203",
+      "userId": "admin",
+      "userName": "Super Admin",
+      "userRole": "super_admin",
+      "action": "Ubah Password Petugas",
+      "details": "Super Admin berhasil memperbarui kata sandi untuk akun @petugas_test (Petugas Uji Coba).",
+      "timestamp": "2026-11-09T11:32:30.203Z"
+    },
+    {
+      "id": "log-1794223941368",
+      "userId": "usr-1794223918106",
+      "userName": "Petugas Uji Coba",
+      "userRole": "panitia_spmb",
+      "action": "User Login",
+      "details": "Petugas Petugas Uji Coba (panitia_spmb) berhasil masuk ke sistem.",
+      "timestamp": "2026-11-09T11:32:21.368Z"
+    },
+    {
+      "id": "log-1794223918106",
+      "userId": "admin",
+      "userName": "Super Admin",
+      "userRole": "super_admin",
+      "action": "Buat Akun Petugas Baru",
+      "details": "Super Admin membuat akun petugas baru \"Petugas Uji Coba\" (@petugas_test) dengan peran panitia_spmb.",
+      "timestamp": "2026-11-09T11:31:58.107Z"
+    },
     {
       "id": "log-1794151159352",
       "userId": "admin",

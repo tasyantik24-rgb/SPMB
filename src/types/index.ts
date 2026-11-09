@@ -36,6 +36,7 @@ export interface User {
   lastLogin?: string; // Compatibility alias
   mustChangePassword?: boolean;
   password?: string; // Stored hashed/salted or server state
+  passwordHash?: string;
 }
 
 export interface CreateUserPayload {

@@ -353,6 +353,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             <UserManager
               users={users}
               onRefresh={fetchAllData}
+              currentUser={currentUser}
             />
           )}
 
