@@ -240,7 +240,6 @@ export const UserManager: React.FC<UserManagerProps> = ({ users, onRefresh }) =>
                 <th className="py-3 px-4">Nama & Username</th>
                 <th className="py-3 px-4">Email & WhatsApp</th>
                 <th className="py-3 px-4">Jabatan</th>
-                <th className="py-3 px-4">Password</th>
                 <th className="py-3 px-4">Hak Akses (Role)</th>
                 <th className="py-3 px-4 text-center">Status</th>
                 <th className="py-3 px-4">Terakhir Login</th>
@@ -277,30 +276,6 @@ export const UserManager: React.FC<UserManagerProps> = ({ users, onRefresh }) =>
 
                   <td className="py-3 px-4 text-stone-700 font-medium">
                     {u.jabatan || '-'}
-                  </td>
-
-                  {/* Password is stored as a secure hash and cannot be read back. Use reset to set a new one. */}
-                  <td className="py-3 px-4">
-                    <div className="flex items-center gap-2 min-w-[150px]">
-                      <span className="font-mono tracking-widest text-stone-500" aria-label="Password tersimpan secara aman">••••••••</span>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setResetTargetUser(u);
-                          setNewPassword(u.role === 'super_admin' ? '123456' : '');
-                          setConfirmPassword(u.role === 'super_admin' ? '123456' : '');
-                          setShowResetNewPassword(true);
-                          setShowResetConfirmPassword(false);
-                          setResetFeedback(null);
-                          setCompletedResetInfo(null);
-                        }}
-                        className="inline-flex items-center gap-1 px-2 py-1 rounded-md border border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100 font-semibold text-[10px]"
-                        title="Atur atau ubah password akun ini"
-                      >
-                        <Key className="w-3 h-3" />
-                        <span>Ubah</span>
-                      </button>
-                    </div>
                   </td>
 
                   <td className="py-3 px-4">
@@ -349,6 +324,19 @@ export const UserManager: React.FC<UserManagerProps> = ({ users, onRefresh }) =>
 
                   <td className="py-3 px-4 text-right">
                     <div className="flex items-center justify-end gap-1">
+                      <button
+                        onClick={() => {
+                          setResetTargetUser(u);
+                          setNewPassword('');
+                          setConfirmPassword('');
+                          setResetFeedback(null);
+                        }}
+                        className="p-1.5 text-amber-700 hover:text-amber-900 hover:bg-amber-50 rounded-md transition-colors cursor-pointer"
+                        title="Atur Ulang / Reset Password"
+                      >
+                        <Key className="w-3.5 h-3.5" />
+                      </button>
+
                       <button
                         onClick={() => {
                           setErrorMsg(null);
@@ -662,7 +650,7 @@ export const UserManager: React.FC<UserManagerProps> = ({ users, onRefresh }) =>
                   <Key className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-sm">{resetTargetUser.role === 'super_admin' ? 'Ubah Password Super Admin' : 'Atur Ulang Password Petugas'}</h3>
+                  <h3 className="font-bold text-sm">Atur Ulang Password Petugas</h3>
                   <p className="text-[11px] text-stone-500 font-mono">@{resetTargetUser.username}</p>
                 </div>
               </div>
@@ -767,13 +755,8 @@ export const UserManager: React.FC<UserManagerProps> = ({ users, onRefresh }) =>
                     Jabatan: <strong>{resetTargetUser.jabatan || '-'}</strong>
                   </p>
                   <p className="text-amber-800 font-semibold pt-1">
-                    * Password lama tidak dapat ditampilkan karena disimpan dalam bentuk hash. Atur password baru di bawah ini; password baru akan langsung aktif setelah disimpan.
+                    * Password lama tidak ditampilkan demi privasi. Password baru akan langsung aktif dan dicatat di audit log.
                   </p>
-                  {resetTargetUser.role === 'super_admin' && (
-                    <p className="text-emerald-800 font-semibold pt-1">
-                      Password awal yang diminta: 123456. Anda dapat menggantinya kapan saja melalui kolom Ubah.
-                    </p>
-                  )}
                 </div>
 
                 {resetFeedback && (
