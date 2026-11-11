@@ -330,6 +330,18 @@ export const api = {
   async deleteTeacher(id: string): Promise<void> {
     await fetch(`${BASE_URL}/cms/teachers/${id}`, { method: 'DELETE' });
   },
+  async uploadTeacherPhoto(dataUrl: string, teacherName?: string): Promise<{ url: string }> {
+    const res = await fetch(`${BASE_URL}/cms/teachers/upload-photo`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ dataUrl, teacherName })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Gagal mengunggah foto guru');
+    }
+    return await res.json();
+  },
 
   // CMS: Programs
   async getPrograms(): Promise<ProgramUnggulan[]> {

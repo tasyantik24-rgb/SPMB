@@ -698,8 +698,9 @@ export const ApplicantDetailPdfModal: React.FC<ApplicantDetailPdfModalProps> = (
                     </div>
                   </div>
                   <p className="font-bold text-stone-900 border-t border-stone-400 pt-1 inline-block min-w-[180px]">
-                    Panitia SPMB SDIT Insan Cendikia
+                    ( {schoolProfile.spmbChairmanName || 'Tasyantik Salsabilla, S.Pd.'} )
                   </p>
+                  <p className="text-[10px] text-stone-500">Ketua Panitia SPMB</p>
                 </div>
               </div>
             </div>

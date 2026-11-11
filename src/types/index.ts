@@ -481,6 +481,7 @@ export interface SchoolProfile {
   headmasterName: string;
   headmasterGreeting: string;
   headmasterPhoto?: string;
+  spmbChairmanName?: string;
   history: string;
   vision: string;
   mission: string[];

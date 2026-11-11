@@ -233,14 +233,27 @@ export const SchoolProfileEditor: React.FC<SchoolProfileEditorProps> = ({
           Pimpinan Sekolah & Visi Misi
         </h3>
 
-        <div>
-          <label className="block font-medium text-stone-700 mb-1">Nama Kepala Sekolah & Gelar</label>
-          <input
-            type="text"
-            value={form.headmasterName}
-            onChange={e => setForm({ ...form, headmasterName: e.target.value })}
-            className="w-full p-2.5 rounded-lg border border-stone-300 font-bold"
-          />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block font-medium text-stone-700 mb-1">Nama Kepala Sekolah & Gelar</label>
+            <input
+              type="text"
+              value={form.headmasterName}
+              onChange={e => setForm({ ...form, headmasterName: e.target.value })}
+              className="w-full p-2.5 rounded-lg border border-stone-300 font-bold"
+            />
+          </div>
+
+          <div>
+            <label className="block font-medium text-stone-700 mb-1">Nama Ketua Panitia SPMB & Gelar</label>
+            <input
+              type="text"
+              value={form.spmbChairmanName || ''}
+              onChange={e => setForm({ ...form, spmbChairmanName: e.target.value })}
+              placeholder="Contoh: Tasyantik Salsabilla, S.Pd."
+              className="w-full p-2.5 rounded-lg border border-stone-300 font-bold"
+            />
+          </div>
         </div>
 
         <div>
@@ -271,6 +284,52 @@ export const SchoolProfileEditor: React.FC<SchoolProfileEditorProps> = ({
             onChange={e => setForm({ ...form, vision: e.target.value })}
             className="w-full p-2.5 rounded-lg border border-stone-300 font-medium"
           />
+        </div>
+
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <label className="block font-bold text-stone-900">
+              Misi Pendidikan Sekolah ({form.mission.length} Butir)
+            </label>
+            <button
+              type="button"
+              onClick={() => setForm({ ...form, mission: [...form.mission, ''] })}
+              className="text-xs text-emerald-800 hover:text-emerald-900 font-bold flex items-center gap-1 cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Tambah Butir Misi</span>
+            </button>
+          </div>
+          <div className="space-y-2">
+            {form.mission.map((item, idx) => (
+              <div key={idx} className="flex items-center gap-2">
+                <span className="w-6 h-6 rounded-full bg-emerald-50 text-emerald-800 font-bold text-[11px] flex items-center justify-center shrink-0">
+                  {idx + 1}
+                </span>
+                <input
+                  type="text"
+                  value={item}
+                  onChange={e => {
+                    const newM = [...form.mission];
+                    newM[idx] = e.target.value;
+                    setForm({ ...form, mission: newM });
+                  }}
+                  className="flex-1 p-2 rounded-lg border border-stone-300 text-xs"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    const newM = form.mission.filter((_, i) => i !== idx);
+                    setForm({ ...form, mission: newM });
+                  }}
+                  className="p-1.5 text-stone-400 hover:text-rose-600 rounded cursor-pointer"
+                  title="Hapus butir misi"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 

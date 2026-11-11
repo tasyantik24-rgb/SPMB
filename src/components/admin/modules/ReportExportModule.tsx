@@ -815,7 +815,7 @@ export const ReportExportModule: React.FC<ReportExportModuleProps> = ({
               <span className="italic text-stone-400 text-[10px]">(Tanda Tangan & Stempel)</span>
             </div>
             <p className="font-bold underline text-stone-900">
-              ( Ahmad Syafii, A.Md.Kom. )
+              ( {schoolProfile.spmbChairmanName || 'Tasyantik Salsabilla, S.Pd.'} )
             </p>
           </div>
 
@@ -828,7 +828,7 @@ export const ReportExportModule: React.FC<ReportExportModuleProps> = ({
               </div>
             </div>
             <p className="font-bold underline text-stone-900">
-              ( {schoolProfile.headmasterName} )
+              ( {schoolProfile.headmasterName || 'Jaya Saputra Ria Novandanu, S.Pd., Gr.'} )
             </p>
           </div>
         </div>

@@ -1751,12 +1751,53 @@ async function startServer() {
     res.json(db.spmbWave);
   });
 
+  // Helper to persist base64 photo for teacher
+  const persistTeacherPhoto = (dataUrlOrPath?: string, teacherName?: string): string | undefined => {
+    if (!dataUrlOrPath) return dataUrlOrPath;
+    if (dataUrlOrPath.startsWith('data:image/')) {
+      const match = dataUrlOrPath.match(/^data:image\/([a-zA-Z0-9-+.]+);base64,(.+)$/);
+      if (match) {
+        const mimeType = match[1];
+        const base64Data = match[2];
+        const buffer = Buffer.from(base64Data, 'base64');
+        const ext = mimeType.includes('png') ? '.png' : mimeType.includes('webp') ? '.webp' : '.jpg';
+        const cleanName = (teacherName || 'guru').toLowerCase().replace(/[^a-z0-9]/g, '_').substring(0, 20);
+        const fileName = `guru_${cleanName}_${Date.now()}${ext}`;
+        const filePath = path.resolve(UPLOADS_DIR, fileName);
+        fs.writeFileSync(filePath, buffer);
+        return `/uploads/${fileName}`;
+      }
+    }
+    return dataUrlOrPath;
+  };
+
+  // CMS: Upload Teacher Photo endpoint
+  app.post('/api/cms/teachers/upload-photo', (req: Request, res: Response) => {
+    try {
+      const { dataUrl, teacherName } = req.body;
+      if (!dataUrl) {
+        return res.status(400).json({ error: 'Data foto tidak valid atau kosong' });
+      }
+      const savedUrl = persistTeacherPhoto(dataUrl, teacherName);
+      if (!savedUrl) {
+        return res.status(400).json({ error: 'Gagal memproses data gambar foto' });
+      }
+      res.json({ success: true, url: savedUrl });
+    } catch (err: any) {
+      res.status(500).json({ error: 'Gagal mengunggah foto: ' + (err.message || 'Error') });
+    }
+  });
+
   // CMS: Teachers CRUD
   app.get('/api/cms/teachers', (req: Request, res: Response) => {
     res.json(db.teachers);
   });
   app.post('/api/cms/teachers', (req: Request, res: Response) => {
-    const newTeacher = { ...req.body, id: `tch-${Date.now()}` };
+    let photoUrl = req.body.imageUrl;
+    if (photoUrl && photoUrl.startsWith('data:image/')) {
+      photoUrl = persistTeacherPhoto(photoUrl, req.body.name);
+    }
+    const newTeacher = { ...req.body, imageUrl: photoUrl, id: `tch-${Date.now()}` };
     db.teachers.push(newTeacher);
     saveDatabase(db);
     res.status(201).json(newTeacher);
@@ -1764,7 +1805,15 @@ async function startServer() {
   app.put('/api/cms/teachers/:id', (req: Request, res: Response) => {
     const idx = db.teachers.findIndex(t => t.id === req.params.id);
     if (idx === -1) return res.status(404).json({ error: 'Guru tidak ditemukan' });
-    db.teachers[idx] = { ...db.teachers[idx], ...req.body };
+    let photoUrl = req.body.imageUrl;
+    if (photoUrl && photoUrl.startsWith('data:image/')) {
+      photoUrl = persistTeacherPhoto(photoUrl, req.body.name || db.teachers[idx].name);
+    }
+    db.teachers[idx] = {
+      ...db.teachers[idx],
+      ...req.body,
+      imageUrl: photoUrl !== undefined ? photoUrl : db.teachers[idx].imageUrl
+    };
     saveDatabase(db);
     res.json(db.teachers[idx]);
   });

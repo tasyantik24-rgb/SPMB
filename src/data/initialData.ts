@@ -43,16 +43,15 @@ export const INITIAL_SCHOOL_PROFILE: SchoolProfile = {
     lat: -8.2871,
     lng: 113.9758
   },
-  headmasterName: 'Ust. H. Rahmat Hidayat, S.Pd.I., M.Pd.',
-  headmasterGreeting: 'Bismillahir-rahmaanir-rahiim. Alhamdulillahi Rabbil \'Alamin. Selamat datang di portal resmi SDIT Insan Cendikia Kalibaru. Kami berikhtiar menyelenggarakan pendidikan dasar Islam terpadu yang memadukan keunggulan tsaqafah Islamiyah, pembiasaan adab mulia, dan kompetensi sains modern. Dengan bimbingan para asatidz yang berdedikasi serta lingkungan sekolah yang asri di lereng Gunung Raung Kalibaru Banyuwangi, kami berkomitmen mendampingi setiap ananda bertumbuh menjadi insan shaleh yang berkarakter kokoh dan berwawasan luas.',
+  headmasterName: 'Jaya Saputra Ria Novandanu, S.Pd., Gr.',
+  headmasterGreeting: 'Bismillahir-rahmaanir-rahiim. Alhamdulillahi Rabbil \'Alamin. Selamat datang di portal resmi SPMB SDIT Insan Cendikia Kalibaru. Kami berkomitmen menyelenggarakan pendidikan dasar Islam terpadu yang memadukan keunggulan tsaqafah Islamiyah, pembiasaan adab mulia, dan kecakapan abad 21 dengan visi Sholih, Cerdas, dan Mandiri. Bersama dewan asatidz berdedikasi tinggi di lereng Gunung Raung Kalibaru Banyuwangi, kami siap membimbing putra-putri tercinta menjadi generasi Qur\'ani yang berkarakter kuat dan berprestasi.',
+  spmbChairmanName: 'Tasyantik Salsabilla, S.Pd.',
   history: 'SDIT Insan Cendikia Kalibaru didirikan oleh Yayasan Bina Insan Cendikia Kalibaru dengan semangat menghadirkan pendidikan dasar Islam terpadu berkualitas tinggi di wilayah Banyuwangi Barat. Berangkat dari kesadaran pentingnya menanamkan pondasi akidah, hafalan Al-Qur\'an, dan kecakapan abad 21 sejak usia dini, sekolah ini terus bertumbuh dengan sarana belajar representatif, tenaga pendidik berkompeten, dan kemitraan erat bersama wali murid serta masyarakat.',
-  vision: 'Terwujudnya Generasi Qur\'ani yang Unggul dalam Prestasi, Mandiri, dan Berakhlakul Karimah Berlandaskan Al-Qur\'an dan As-Sunnah.',
+  vision: 'Sholih, Cerdas, Mandiri',
   mission: [
-    'Menanamkan akidah shahihah dan pembiasaan ibadah yaumiyah secara istiqomah.',
-    'Menyelenggarakan program Tahfidz Al-Qur\'an dengan metode Talaqqi dan tartil.',
-    'Mengembangkan pembelajaran aktif, inovatif, dan berakar pada Kurikulum Merdeka yang terintegrasi nilai Islam.',
-    'Membina kemandirian, kepemimpinan, dan kepedulian sosial melalui kegiatan kepanduan dan ekstrakurikuler.',
-    'Mewujudkan iklim sekolah yang aman, asri, ramah anak, dan berbudaya lingkungan hidup.'
+    "Membekali Peserta Didik Taat Beribadah, Berakhlak Mulia, dan Cinta Al-Qur'an.",
+    "Mengembangkan Proses Pembelajaran yang Menyenangkan dan Prestatif (IQ dan EQ).",
+    "Membiasakan Hidup Bersih dan Disiplin (AQ)."
   ],
   goals: [
     'Lulusan hafal minimal 2-3 Juz Al-Qur\'an dengan bacaan tartil dan memahami makna dasar.',
@@ -246,13 +245,23 @@ export const INITIAL_EXTRACURRICULARS: Extracurricular[] = [
 export const INITIAL_TEACHERS: Teacher[] = [
   {
     id: 'tch-1',
-    name: 'Ust. H. Rahmat Hidayat',
-    title: 'S.Pd.I., M.Pd.',
+    name: 'Jaya Saputra Ria Novandanu, S.Pd., Gr.',
+    title: 'S.Pd., Gr.',
     role: 'Kepala Sekolah',
     division: 'Pimpinan',
-    education: 'S2 Magister Pendidikan Islam - UIN Maliki Malang',
-    quote: 'Mendidik dengan hati, meneladankan adab sebelum ilmu.',
+    education: 'S1 Pendidikan Guru / Profesi Guru (Gr.)',
+    quote: 'Membentuk generasi sholih, cerdas, dan mandiri dengan keteladanan akhlak mulia.',
     order: 1
+  },
+  {
+    id: 'tch-spmb',
+    name: 'Tasyantik Salsabilla, S.Pd.',
+    title: 'S.Pd.',
+    role: 'Ketua Panitia SPMB & Pendidik',
+    division: 'Pimpinan',
+    education: 'S1 Pendidikan Guru',
+    quote: 'Menyambut putra-putri calon generasi penerus bangsa dengan pelayanan prima dan ramah.',
+    order: 2
   },
   {
     id: 'tch-2',
@@ -262,7 +271,7 @@ export const INITIAL_TEACHERS: Teacher[] = [
     division: 'Pimpinan',
     education: 'S1 Pendidikan Guru Sekolah Dasar - Universitas Negeri Malang',
     quote: 'Pembelajaran yang bermakna menghidupkan rasa ingin tahu anak.',
-    order: 2
+    order: 3
   },
   {
     id: 'tch-3',
@@ -570,10 +579,10 @@ export const INITIAL_USERS: User[] = [
     id: 'usr-panitia',
     username: 'panitia_spmb',
     email: 'spmb@sdit-insancendikia.sch.id',
-    name: 'Ahmad Syafii',
-    avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
+    name: 'Tasyantik Salsabilla, S.Pd.',
+    avatarUrl: '',
     role: 'panitia_spmb',
-    jabatan: 'Sekretaris & Verifikator Berkas SPMB',
+    jabatan: 'Ketua Panitia SPMB',
     isActive: true,
     phone: '081234567802',
     createdAt: '2026-01-10T10:00:00Z',
@@ -584,7 +593,7 @@ export const INITIAL_USERS: User[] = [
     username: 'fatimah_seleksi',
     email: 'seleksi@sdit-insancendikia.sch.id',
     name: 'Ustazah Fatimah, S.Psi.',
-    avatarUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=200&q=80',
+    avatarUrl: '',
     role: 'tim_seleksi',
     jabatan: 'Koordinator Tim Observasi & Psikolog Anak',
     isActive: true,
@@ -594,10 +603,10 @@ export const INITIAL_USERS: User[] = [
   },
   {
     id: 'usr-kepsek',
-    username: 'kepsek_rahmat',
+    username: 'kepsek_jaya',
     email: 'kepsek@sdit-insancendikia.sch.id',
-    name: 'Ust. H. Rahmat Hidayat, M.Pd.',
-    avatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80',
+    name: 'Jaya Saputra Ria Novandanu, S.Pd., Gr.',
+    avatarUrl: '',
     role: 'kepala_sekolah',
     jabatan: 'Kepala Sekolah SDIT Insan Cendikia Kalibaru',
     isActive: true,

@@ -242,11 +242,13 @@ export const RegistrationReceipt: React.FC<RegistrationReceiptProps> = ({
 
           <div className="w-56">
             <p className="text-stone-600">Kalibaru, {formatDateId(registration.submittedAt)}</p>
-            <p className="text-stone-600">Panitia SPMB SDIT Insan Cendikia,</p>
+            <p className="text-stone-600">Ketua Panitia SPMB,</p>
             <div className="h-14 flex items-center justify-center">
               <span className="text-[10px] text-stone-400 italic">[Stempel & Tanda Tangan]</span>
             </div>
-            <p className="font-semibold text-stone-900 underline">( Panitia Penerimaan Murid Baru )</p>
+            <p className="font-semibold text-stone-900 underline">
+              ( {schoolProfile.spmbChairmanName || 'Tasyantik Salsabilla, S.Pd.'} )
+            </p>
           </div>
         </div>
       </div>
