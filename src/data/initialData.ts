@@ -1014,7 +1014,7 @@ export const INITIAL_SETTINGS: SystemSettings = {
   enableOnlinePaymentReceipt: true,
   showDemoNotice: true,
   dataSource: 'local_database',
-  firebaseConfigured: false,
+  firebaseConfigured: true,
   googleSheetSettings: {
     spreadsheetId: '1_zt6amQtAr3eGjSPqwaJrIT_irLZvICla9j5lOX2kEM',
     appsScriptUrl: '',

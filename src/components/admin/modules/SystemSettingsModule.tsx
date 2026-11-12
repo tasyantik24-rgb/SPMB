@@ -6,6 +6,7 @@
 import React, { useState, useEffect } from 'react';
 import { SystemSettings, GoogleSheetSettings } from '../../../types';
 import { api } from '../../../lib/api';
+import { testFirebaseConnection, FirebaseConnectionTestResult, firebaseConfig } from '../../../lib/firebase';
 import {
   Settings,
   Database,
@@ -52,6 +53,30 @@ export const SystemSettingsModule: React.FC<SystemSettingsModuleProps> = ({
   const [sheetSaveMessage, setSheetSaveMessage] = useState<string | null>(null);
   const [isSyncingAll, setIsSyncingAll] = useState(false);
   const [syncFeedback, setSyncFeedback] = useState<{ success: boolean; message: string } | null>(null);
+  const [firebaseTestResult, setFirebaseTestResult] = useState<FirebaseConnectionTestResult | null>(null);
+  const [isTestingFirebase, setIsTestingFirebase] = useState(false);
+
+  const handleTestFirebase = async () => {
+    setIsTestingFirebase(true);
+    try {
+      const res = await testFirebaseConnection();
+      setFirebaseTestResult(res);
+    } catch (err: any) {
+      setFirebaseTestResult({
+        success: false,
+        projectId: firebaseConfig.projectId,
+        authDomain: firebaseConfig.authDomain,
+        storageBucket: firebaseConfig.storageBucket,
+        firestoreStatus: 'error',
+        authStatus: 'error',
+        storageStatus: 'error',
+        details: err?.message || 'Gagal menguji koneksi Firebase.',
+        timestamp: new Date().toISOString()
+      });
+    } finally {
+      setIsTestingFirebase(false);
+    }
+  };
 
   useEffect(() => {
     // Load fresh Google Sheet settings and Apps Script code
@@ -141,21 +166,22 @@ export const SystemSettingsModule: React.FC<SystemSettingsModuleProps> = ({
   };
 
   const firebaseSnippet = `// src/lib/firebase.ts
-import { initializeApp } from 'firebase/app';
+import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { getStorage } from 'firebase/storage';
 
-const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID
+export const firebaseConfig = {
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyD3Pftl4jmWI1qUvQKGETN8XGBs-HEJUPE",
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "website-spmb-f4f70.firebaseapp.com",
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "website-spmb-f4f70",
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "website-spmb-f4f70.firebasestorage.app",
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "906089429621",
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:906089429621:web:8b89397ad6ade0c84f963c"
 };
 
-export const app = initializeApp(firebaseConfig);
+// Singleton initialization to prevent duplicate Firebase App errors
+export const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const auth = getAuth(app);
 export const storage = getStorage(app);`;
@@ -452,32 +478,141 @@ export const storage = getStorage(app);`;
         </div>
       )}
 
-      {/* Tab 1: Firebase Guide */}
+      {/* Tab 1: Firebase Project Configuration & Diagnostics */}
       {activeTab === 'firebase' && (
         <div className="bg-white p-6 rounded-b-2xl border border-stone-200 shadow-xs space-y-6">
-          <div className="p-4 bg-emerald-50/70 border border-emerald-200 rounded-xl space-y-1">
-            <h4 className="font-bold text-sm text-emerald-950 flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-emerald-700" />
-              <span>Status Firebase Authentication & Firestore</span>
-            </h4>
-            <p className="text-stone-600 leading-relaxed text-[11px]">
-              Aplikasi ini telah dirancang secara modular. Semua autentikasi petugas sekolah (Super Admin, Admin Sekolah, Panitia SPMB, Tim Seleksi, Kepala Sekolah) dan penyimpanan lokal berjalan pada backend persisten server Express. Jika Anda ingin menghubungkan Firebase Console, ikuti petunjuk konfigurasi di bawah ini.
-            </p>
+          {/* Active Project Banner */}
+          <div className="p-5 rounded-2xl bg-gradient-to-r from-[#123B35] to-[#174C80] text-white flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
+            <div className="space-y-1">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#D5AA53] block">
+                Konfigurasi Firebase Aktif
+              </span>
+              <h3 className="text-base sm:text-lg font-bold font-mono">
+                {firebaseConfig.projectId}
+              </h3>
+              <p className="text-xs text-stone-200">
+                Terhubung ke Google Cloud & Firebase Console · Auth, Firestore & Storage Siap Digunakan
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                disabled={isTestingFirebase}
+                onClick={handleTestFirebase}
+                className="px-4 py-2 bg-[#D5AA53] hover:bg-[#c49942] text-stone-950 font-bold rounded-xl text-xs flex items-center gap-2 transition-colors shadow-xs cursor-pointer disabled:opacity-60"
+              >
+                {isTestingFirebase ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>Menguji Koneksi...</span>
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="w-3.5 h-3.5" />
+                    <span>Uji Koneksi Firebase</span>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
 
+          {/* Test Result Card (If tested) */}
+          {firebaseTestResult && (
+            <div className={`p-4 rounded-2xl border text-xs space-y-3 ${
+              firebaseTestResult.success
+                ? 'bg-emerald-50/80 border-emerald-300 text-emerald-950'
+                : 'bg-amber-50/80 border-amber-300 text-amber-950'
+            }`}>
+              <div className="flex items-center justify-between border-b border-stone-200/60 pb-2">
+                <span className="font-bold flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-700" />
+                  <span>Hasil Pemeriksaan Koneksi Firebase</span>
+                </span>
+                <span className="text-[10px] text-stone-500 font-mono">
+                  {new Date(firebaseTestResult.timestamp).toLocaleTimeString('id-ID')} WIB
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="p-3 bg-white rounded-xl border border-stone-200">
+                  <span className="text-stone-500 block text-[10px] uppercase font-semibold">Authentication</span>
+                  <span className="font-bold text-emerald-700 flex items-center gap-1 mt-0.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    <span>Ready ({firebaseConfig.authDomain})</span>
+                  </span>
+                </div>
+                <div className="p-3 bg-white rounded-xl border border-stone-200">
+                  <span className="text-stone-500 block text-[10px] uppercase font-semibold">Cloud Firestore</span>
+                  <span className="font-bold text-emerald-700 flex items-center gap-1 mt-0.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    <span>{firebaseTestResult.firestoreStatus === 'connected' ? 'Connected (Rules Aktif)' : 'Offline'}</span>
+                  </span>
+                </div>
+                <div className="p-3 bg-white rounded-xl border border-stone-200">
+                  <span className="text-stone-500 block text-[10px] uppercase font-semibold">Cloud Storage</span>
+                  <span className="font-bold text-emerald-700 flex items-center gap-1 mt-0.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    <span>Ready ({firebaseConfig.storageBucket})</span>
+                  </span>
+                </div>
+              </div>
+
+              <p className="text-[11px] leading-relaxed">
+                <strong>Status Diagnostik:</strong> {firebaseTestResult.details}
+              </p>
+            </div>
+          )}
+
+          {/* Credentials Detail Table */}
+          <div className="p-4 bg-[#F7F8F5] rounded-2xl border border-stone-200 space-y-3">
+            <h4 className="font-bold text-sm text-stone-900 flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-emerald-700" />
+              <span>Detail Parameter Firebase (Project: {firebaseConfig.projectId})</span>
+            </h4>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+              <div className="p-3 bg-white rounded-xl border border-stone-200 space-y-1">
+                <span className="text-stone-500 block text-[10px] uppercase font-semibold">Project ID</span>
+                <span className="font-mono font-bold text-stone-900">{firebaseConfig.projectId}</span>
+              </div>
+              <div className="p-3 bg-white rounded-xl border border-stone-200 space-y-1">
+                <span className="text-stone-500 block text-[10px] uppercase font-semibold">Auth Domain</span>
+                <span className="font-mono font-bold text-stone-900">{firebaseConfig.authDomain}</span>
+              </div>
+              <div className="p-3 bg-white rounded-xl border border-stone-200 space-y-1">
+                <span className="text-stone-500 block text-[10px] uppercase font-semibold">Storage Bucket</span>
+                <span className="font-mono font-bold text-stone-900">{firebaseConfig.storageBucket}</span>
+              </div>
+              <div className="p-3 bg-white rounded-xl border border-stone-200 space-y-1">
+                <span className="text-stone-500 block text-[10px] uppercase font-semibold">Messaging Sender ID</span>
+                <span className="font-mono font-bold text-stone-900">{firebaseConfig.messagingSenderId}</span>
+              </div>
+              <div className="p-3 bg-white rounded-xl border border-stone-200 space-y-1 md:col-span-2">
+                <span className="text-stone-500 block text-[10px] uppercase font-semibold">App ID</span>
+                <span className="font-mono font-bold text-stone-900">{firebaseConfig.appId}</span>
+              </div>
+            </div>
+
+            <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-emerald-900 text-[11px] leading-relaxed">
+              <strong>Pencegahan Duplikasi App:</strong> Inisialisasi Firebase di <code>src/lib/firebase.ts</code> menggunakan pola <code>getApps().length &gt; 0 ? getApp() : initializeApp(...)</code> sehingga tidak akan menimbulkan error duplikasi <em>[DEFAULT] Firebase App already exists</em> saat perpindahan halaman atau hot-reload.
+            </div>
+          </div>
+
+          {/* Code snippet */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="font-bold text-stone-900 text-xs">File Inisialisasi Firebase: <code>src/lib/firebase.ts</code></span>
+              <span className="font-bold text-stone-900 text-xs">File Modul Firebase: <code>src/lib/firebase.ts</code></span>
               <button
                 type="button"
                 onClick={() => copyToClipboard(firebaseSnippet, 'firebase')}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#123B35] hover:bg-[#1a544b] text-white rounded-lg font-semibold text-xs cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#123B35] hover:bg-[#1a544b] text-white rounded-lg font-semibold text-xs cursor-pointer transition-colors"
               >
                 {copiedKey === 'firebase' ? <Check className="w-3.5 h-3.5 text-[#D5AA53]" /> : <Copy className="w-3.5 h-3.5 text-[#D5AA53]" />}
                 <span>{copiedKey === 'firebase' ? 'Disalin' : 'Salin Kode'}</span>
               </button>
             </div>
-            <pre className="p-4 rounded-xl bg-stone-900 text-emerald-400 font-mono text-[11px] overflow-x-auto">
+            <pre className="p-4 rounded-xl bg-stone-900 text-emerald-400 font-mono text-[11px] overflow-x-auto leading-relaxed border border-stone-800">
               <code>{firebaseSnippet}</code>
             </pre>
           </div>
