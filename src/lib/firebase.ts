@@ -14,14 +14,15 @@ export const firebaseConfig = {
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "website-spmb-f4f70",
   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "website-spmb-f4f70.firebasestorage.app",
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "906089429621",
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:906089429621:web:8b89397ad6ade0c84f963c"
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:906089429621:web:8b89397ad6ade0c84f963c",
+  firestoreDatabaseId: import.meta.env.VITE_FIREBASE_DATABASE_ID || "ai-studio-sditinsancendiki-27ab258d-4cf9-4dde-a9f5-662f868ac7f2"
 };
 
 // Inisialisasi Singleton: Mencegah duplikasi Firebase App ("Firebase App named '[DEFAULT]' already exists")
 export const app: FirebaseApp = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 
-// Layanan Firebase utama terikat ke project website-spmb-f4f70
-export const db: Firestore = getFirestore(app);
+// Layanan Firebase utama terikat ke project website-spmb-f4f70 dan database yang diprovisi
+export const db: Firestore = getFirestore(app, firebaseConfig.firestoreDatabaseId);
 export const auth: Auth = getAuth(app);
 export const storage: FirebaseStorage = getStorage(app);
 

@@ -177,12 +177,13 @@ export const firebaseConfig = {
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "website-spmb-f4f70",
   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "website-spmb-f4f70.firebasestorage.app",
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "906089429621",
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:906089429621:web:8b89397ad6ade0c84f963c"
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:906089429621:web:8b89397ad6ade0c84f963c",
+  firestoreDatabaseId: import.meta.env.VITE_FIREBASE_DATABASE_ID || "ai-studio-sditinsancendiki-27ab258d-4cf9-4dde-a9f5-662f868ac7f2"
 };
 
 // Singleton initialization to prevent duplicate Firebase App errors
 export const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
-export const db = getFirestore(app);
+export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
 export const auth = getAuth(app);
 export const storage = getStorage(app);`;
 
@@ -587,6 +588,10 @@ export const storage = getStorage(app);`;
               <div className="p-3 bg-white rounded-xl border border-stone-200 space-y-1">
                 <span className="text-stone-500 block text-[10px] uppercase font-semibold">Messaging Sender ID</span>
                 <span className="font-mono font-bold text-stone-900">{firebaseConfig.messagingSenderId}</span>
+              </div>
+              <div className="p-3 bg-white rounded-xl border border-stone-200 space-y-1">
+                <span className="text-stone-500 block text-[10px] uppercase font-semibold">Database ID (Firestore)</span>
+                <span className="font-mono font-bold text-stone-900 break-all">{firebaseConfig.firestoreDatabaseId}</span>
               </div>
               <div className="p-3 bg-white rounded-xl border border-stone-200 space-y-1 md:col-span-2">
                 <span className="text-stone-500 block text-[10px] uppercase font-semibold">App ID</span>
